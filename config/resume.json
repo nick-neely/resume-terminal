@@ -4,19 +4,19 @@
     {
       "company": "Lean Techniques",
       "position": "Professional Software Consultant",
-      "duration": "August 2024 – Present",
+      "duration": "August 2024 - Present",
       "description": "Developing solutions using TypeScript, React, and .NET. Key projects include modernizing legacy systems and creating scalable web applications with cloud integration."
     },
     {
       "company": "Lean Techniques",
       "position": "Software Engineer Intern",
-      "duration": "June 2024 – August 2024",
+      "duration": "June 2024 - August 2024",
       "description": "Developed a TypeScript-based mock photo album API using AWS and implemented serverless architecture. Evaluated React form builder libraries and authored comprehensive analyses to assist client decision-making."
     },
     {
       "company": "Moore Hearing Clinic",
       "position": "Digital Operations Specialist",
-      "duration": "September 2015 – May 2024",
+      "duration": "September 2015 - May 2024",
       "description": "Automated insurance calculations and payroll processes using Python, resulting in significant time savings and error reductions. Built a clinic management system with React and Node.js."
     }
   ],
