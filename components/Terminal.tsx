@@ -9,12 +9,15 @@ import {
 } from "@/components/ui/tooltip";
 import { commands } from "@/types/commands";
 import { executeCommand, parseCommand } from "@/utils/commandParser";
+import { downloadFile } from "@/utils/downloadFile";
 import { getCurrentDirectory, initialVFS } from "@/utils/virtualFileSystem";
-import { desktopWelcomeMessage, mobileWelcomeMessage } from "@/utils/welcomeMessage";
+import {
+  desktopWelcomeMessage,
+  mobileWelcomeMessage,
+} from "@/utils/welcomeMessage";
 import { DownloadIcon, ExternalLinkIcon } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { downloadFile } from "@/utils/downloadFile";
 
 export default function Terminal() {
   const [isMobile, setIsMobile] = useState(false);
@@ -25,6 +28,7 @@ export default function Terminal() {
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [, setHistoryIndex] = useState<number | null>(null);
   const [vfs, setVfs] = useState(initialVFS);
+  const [hasUsedTab, setHasUsedTab] = useState(false);
 
   useEffect(() => {
     const checkWidth = () => {
@@ -32,10 +36,12 @@ export default function Terminal() {
     };
 
     checkWidth();
-    setOutput([window.innerWidth < 768 ? mobileWelcomeMessage : desktopWelcomeMessage]);
+    setOutput([
+      window.innerWidth < 768 ? mobileWelcomeMessage : desktopWelcomeMessage,
+    ]);
 
-    window.addEventListener('resize', checkWidth);
-    return () => window.removeEventListener('resize', checkWidth);
+    window.addEventListener("resize", checkWidth);
+    return () => window.removeEventListener("resize", checkWidth);
   }, []);
 
   const handleInputChange = useCallback(
@@ -80,16 +86,15 @@ export default function Terminal() {
       const lastPart = inputParts[inputParts.length - 1];
 
       if (inputParts.length === 1 && lastPart !== "") {
-        // Autocomplete command
         const matchingCommands = Object.keys(commands).filter((cmd) =>
           cmd.startsWith(lastPart)
         );
         if (matchingCommands.length === 1) {
           inputParts[0] = matchingCommands[0];
           setInput(inputParts.join(" "));
+          setHasUsedTab(true);
         }
       } else {
-        // Autocomplete file or directory
         try {
           const currentDir = getCurrentDirectory(vfs);
           const options = currentDir.children
@@ -101,6 +106,7 @@ export default function Terminal() {
           if (matchingOptions.length === 1) {
             inputParts[inputParts.length - 1] = matchingOptions[0];
             setInput(inputParts.join(" "));
+            setHasUsedTab(true);
           }
         } catch (error) {
           console.error("Error while autocompleting path:", error);
@@ -159,7 +165,7 @@ export default function Terminal() {
   );
 
   const handleDownload = () => {
-    downloadFile('resume.pdf');
+    downloadFile("resume.pdf");
   };
 
   useEffect(() => {
@@ -234,9 +240,14 @@ export default function Terminal() {
             onSubmit={handleInputSubmit}
             className="border-t border-zinc-700"
           >
-            <div className="flex p-2">
+            <div className="flex p-2 relative">
               <span className="text-zinc-500 mr-2 shrink-0">$</span>
               <div className="relative flex-grow min-h-[24px]">
+                {!hasUsedTab && (
+                  <span className="absolute right-2 top-0 text-xs text-zinc-600 pointer-events-none">
+                    Press Tab to autocomplete
+                  </span>
+                )}
                 <input
                   ref={inputRef}
                   type="text"
