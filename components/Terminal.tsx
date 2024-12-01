@@ -13,8 +13,7 @@ export default function Terminal() {
   const outputRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [historyIndex, setHistoryIndex] = useState<number | null>(null);
+  const [, setHistoryIndex] = useState<number | null>(null);
   const [vfs, setVfs] = useState(initialVFS);
 
   const handleInputChange = useCallback(
