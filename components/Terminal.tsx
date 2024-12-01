@@ -1,13 +1,20 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { commands } from "@/types/commands";
 import { executeCommand, parseCommand } from "@/utils/commandParser";
 import { getCurrentDirectory, initialVFS } from "@/utils/virtualFileSystem";
 import { welcomeMessage } from "@/utils/welcomeMessage";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { DownloadIcon, ExternalLinkIcon } from "lucide-react";
 import Link from "next/link";
-import { ExternalLinkIcon } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { downloadFile } from "@/utils/downloadFile";
 
 export default function Terminal() {
   const [input, setInput] = useState("");
@@ -138,6 +145,10 @@ export default function Terminal() {
     []
   );
 
+  const handleDownload = () => {
+    downloadFile('resume.pdf');
+  };
+
   useEffect(() => {
     if (outputRef.current) {
       outputRef.current.scrollTop = outputRef.current.scrollHeight;
@@ -159,20 +170,49 @@ export default function Terminal() {
               <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
               <div className="w-3 h-3 rounded-full bg-green-500"></div>
             </div>
-            <Link
-              href="/resume"
-              className="flex items-center gap-1 text-xs text-zinc-400 hover:text-zinc-200 transition-colors"
-            >
-              <span>view resume</span>
-              <ExternalLinkIcon className="w-3 h-3" />
-            </Link>
+            <div className="flex items-center gap-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link
+                      href="/resume"
+                      className="p-1.5 text-zinc-400 hover:text-zinc-200 transition-colors rounded-md hover:bg-zinc-700/50"
+                    >
+                      <ExternalLinkIcon className="w-4 h-4" />
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>View Resume</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={handleDownload}
+                      className="p-1.5 text-zinc-400 hover:text-zinc-200 transition-colors rounded-md hover:bg-zinc-700/50"
+                    >
+                      <DownloadIcon className="w-4 h-4" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Download Resume</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           </div>
           <div
             ref={outputRef}
             className="h-[60vh] p-4 overflow-auto whitespace-pre-wrap"
           >
             {output.map((line, index) => (
-              <div key={index} className={`mb-2 ${line.startsWith('$') ? 'text-zinc-500' : ''}`}>
+              <div
+                key={index}
+                className={`mb-2 ${
+                  line.startsWith("$") ? "text-zinc-500" : ""
+                }`}
+              >
                 {line}
               </div>
             ))}
