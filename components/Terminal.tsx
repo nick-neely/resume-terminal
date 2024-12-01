@@ -10,20 +10,33 @@ import {
 import { commands } from "@/types/commands";
 import { executeCommand, parseCommand } from "@/utils/commandParser";
 import { getCurrentDirectory, initialVFS } from "@/utils/virtualFileSystem";
-import { welcomeMessage } from "@/utils/welcomeMessage";
+import { desktopWelcomeMessage, mobileWelcomeMessage } from "@/utils/welcomeMessage";
 import { DownloadIcon, ExternalLinkIcon } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { downloadFile } from "@/utils/downloadFile";
 
 export default function Terminal() {
+  const [isMobile, setIsMobile] = useState(false);
   const [input, setInput] = useState("");
-  const [output, setOutput] = useState<string[]>([welcomeMessage]);
+  const [output, setOutput] = useState<string[]>([]);
   const outputRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [, setHistoryIndex] = useState<number | null>(null);
   const [vfs, setVfs] = useState(initialVFS);
+
+  useEffect(() => {
+    const checkWidth = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkWidth();
+    setOutput([window.innerWidth < 768 ? mobileWelcomeMessage : desktopWelcomeMessage]);
+
+    window.addEventListener('resize', checkWidth);
+    return () => window.removeEventListener('resize', checkWidth);
+  }, []);
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
