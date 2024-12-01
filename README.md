@@ -61,12 +61,6 @@
 
 3. **Configure Resume Data**
 
-   - Copy the sample configuration file:
-
-     ```bash
-     cp config/sample.resume.json config/resume.json
-     ```
-
    - Edit `config/resume.json` with your personal resume details following the [Schema Design](#schema-design).
 
 4. **Run the Development Server**

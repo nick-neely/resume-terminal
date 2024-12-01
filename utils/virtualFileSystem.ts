@@ -1,5 +1,5 @@
 import { ResumeSchema } from "@/types/schema";
-import resumeData from "../data/resume.json";
+import resumeData from "../config/resume.json";
 
 type FileContent = string;
 
