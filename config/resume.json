@@ -1,38 +1,56 @@
 {
-  "about": "I am a software developer with 5 years of experience in web technologies.",
+  "about": "Aspiring full-stack developer leveraging extensive expertise in TypeScript, React, and front-end technologies to contribute innovative solutions and grow in a dynamic environment.",
   "experience": [
     {
-      "company": "TechCorp",
-      "position": "Software Engineer",
-      "duration": "2018-2021",
-      "description": "Worked on developing scalable web applications."
+      "company": "Lean Techniques",
+      "position": "Professional Software Consultant",
+      "duration": "August 2024 – Present",
+      "description": "Developing solutions using TypeScript, React, and .NET. Key projects include modernizing legacy systems and creating scalable web applications with cloud integration."
     },
     {
-      "company": "WebSolutions",
-      "position": "Senior Developer",
-      "duration": "2021-present",
-      "description": "Leading a team of developers in building client projects."
+      "company": "Lean Techniques",
+      "position": "Software Engineer Intern",
+      "duration": "June 2024 – August 2024",
+      "description": "Developed a TypeScript-based mock photo album API using AWS and implemented serverless architecture. Evaluated React form builder libraries and authored comprehensive analyses to assist client decision-making."
+    },
+    {
+      "company": "Moore Hearing Clinic",
+      "position": "Digital Operations Specialist",
+      "duration": "September 2015 – May 2024",
+      "description": "Automated insurance calculations and payroll processes using Python, resulting in significant time savings and error reductions. Built a clinic management system with React and Node.js."
     }
   ],
   "skills": {
-    "technical": ["JavaScript", "TypeScript", "React", "Node.js", "SQL"],
-    "soft": ["Communication", "Teamwork", "Problem-solving"]
+    "technical": [
+      "TypeScript",
+      "React",
+      "Next.js",
+      "C#",
+      "Python",
+      "AWS",
+      "Azure",
+      "Postgres",
+      "TailwindCSS",
+      "shadcn/ui"
+    ],
+    "soft": ["Communication", "Teamwork", "Problem-solving", "Adaptability"]
   },
   "projects": [
     {
-      "name": "E-commerce platform",
-      "description": "Built with React and Node.js"
+      "name": "Revify SaaS Revenue Calculator",
+      "description": "Built using Next.js, TailwindCSS, and Neon Postgres. Features include AI-powered growth predictions, add-on pricing customization, and real-time MRR calculations."
     },
     {
-      "name": "Predictive maintenance model",
-      "description": "Developed a machine learning model."
+      "name": "Recipe Realm",
+      "description": "Culinary platform developed with Flask and SQLite, featuring responsive design, user authentication, and a dynamic rating system."
+    },
+    {
+      "name": "Crumbl Craver",
+      "description": "Next.js and Supabase application for weekly Crumbl Cookie flavor updates. Integrated web scraper for data accuracy and real-time updates."
     }
   ],
   "education": {
-    "university": "Bachelor of Science in Computer Science, State University (2014-2018)",
-    "certifications": [
-      "AWS Certified Developer - Associate (2020)",
-      "Google Cloud Professional Cloud Architect (2021)"
-    ]
+    "university": "A.A.S. in Computer Software Development, Indian Hills Community College, Ottumwa, Iowa, August 2024",
+    "certifications": []
   }
 }
