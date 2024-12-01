@@ -21,7 +21,7 @@
 - **Interactive Help Menu**: Access a comprehensive list of available commands and their descriptions.
 - **Section-Specific Commands**: Display detailed information with commands like `view projects` and `show skills`.
 - **Hierarchical Navigation**: Navigate through directories using `cd` and `cd ..`, mimicking a real terminal experience.
-- **Customizable Configuration**: Easily edit and configure your resume details through JSON configuration files. 
+- **Customizable Configuration**: Easily edit and configure your resume details through JSON configuration files.
 - **Cohesive Design**: Styled with Tailwind CSS and shadcn/ui components for a polished and consistent user interface.
 - **Built with Modern Technologies**: Developed using Next.js 15 and React 19 for optimal performance and scalability.
 - **Open Source**: Contribute to the project or customize it to fit your personal branding.
