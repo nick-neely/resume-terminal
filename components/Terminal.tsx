@@ -163,7 +163,7 @@ export default function Terminal() {
             className="h-[60vh] p-4 overflow-auto whitespace-pre-wrap"
           >
             {output.map((line, index) => (
-              <div key={index} className="mb-1">
+              <div key={index} className={`mb-2 ${line.startsWith('$') ? 'text-zinc-500' : ''}`}>
                 {line}
               </div>
             ))}
