@@ -8,6 +8,8 @@
 
 **ResumeTerminal** is an open-source, command-line-based personal resume application that emulates a modern terminal interface. Designed for tech-savvy individuals, product owners, and developers, it allows users to navigate through resume sections such as Employment History, Projects, and Skills using standard terminal commands.
 
+![image](https://github.com/user-attachments/assets/67021aa7-9a3d-4d5b-bd2e-5f8c844953d4)
+
 ---
 
 ## 🖥️ Features
@@ -25,7 +27,7 @@
 
 ## 🚀 Demo
 
-[Live Demo](https://www.nickneely.dev/)
+[Live Demo](https://resume-terminal-nine.vercel.app/)
 
 ---
 
@@ -213,7 +215,7 @@ This project is licensed under the [MIT License](./LICENSE).
 
 ## 🖥️ Screenshots
 
-_Example of the terminal interface displaying resume sections._
+![image](https://github.com/user-attachments/assets/4d198841-6be9-4cf5-86f6-4ed984a3ba02)
 
 ---
 
