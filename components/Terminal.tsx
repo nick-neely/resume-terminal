@@ -6,6 +6,8 @@ import { executeCommand, parseCommand } from "@/utils/commandParser";
 import { getCurrentDirectory, initialVFS } from "@/utils/virtualFileSystem";
 import { welcomeMessage } from "@/utils/welcomeMessage";
 import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { ExternalLinkIcon } from "lucide-react";
 
 export default function Terminal() {
   const [input, setInput] = useState("");
@@ -151,12 +153,19 @@ export default function Terminal() {
     <>
       <Card className="w-full max-w-3xl bg-zinc-900 text-zinc-100 font-mono shadow-lg border border-zinc-700 overflow-hidden">
         <CardContent className="p-0">
-          <div className="flex items-center justify-start bg-zinc-800 px-4 py-2 border-b border-zinc-700 rounded-t-lg">
+          <div className="flex items-center justify-between bg-zinc-800 px-4 py-2 border-b border-zinc-700 rounded-t-lg">
             <div className="flex space-x-2">
               <div className="w-3 h-3 rounded-full bg-red-500"></div>
               <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
               <div className="w-3 h-3 rounded-full bg-green-500"></div>
             </div>
+            <Link
+              href="/resume"
+              className="flex items-center gap-1 text-xs text-zinc-400 hover:text-zinc-200 transition-colors"
+            >
+              <span>view resume</span>
+              <ExternalLinkIcon className="w-3 h-3" />
+            </Link>
           </div>
           <div
             ref={outputRef}
