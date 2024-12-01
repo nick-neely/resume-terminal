@@ -17,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${firaCode.variable}`}>
-      <body>{children}</body>
+      <body className="min-h-screen bg-zinc-900">{children}</body>
     </html>
   )
 }

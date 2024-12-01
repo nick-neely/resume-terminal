@@ -1,5 +1,6 @@
 import { ResumeSchema } from "@/types/schema";
 import resumeData from "../config/resume.json";
+import { getResumeData } from "./resumeParser";
 
 type FileContent = string;
 
@@ -18,7 +19,8 @@ interface VFS {
 let initialVFS: VFS;
 
 try {
-  const parsedResume = ResumeSchema.parse(resumeData);
+  const parsedResume = getResumeData();
+  if (!parsedResume) throw new Error("Failed to parse resume data");
 
   initialVFS = {
     root: {

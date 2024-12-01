@@ -1,11 +1,20 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { commands } from "@/types/commands";
 import { executeCommand, parseCommand } from "@/utils/commandParser";
 import { getCurrentDirectory, initialVFS } from "@/utils/virtualFileSystem";
 import { welcomeMessage } from "@/utils/welcomeMessage";
+import { DownloadIcon, ExternalLinkIcon } from "lucide-react";
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { downloadFile } from "@/utils/downloadFile";
 
 export default function Terminal() {
   const [input, setInput] = useState("");
@@ -136,6 +145,10 @@ export default function Terminal() {
     []
   );
 
+  const handleDownload = () => {
+    downloadFile('resume.pdf');
+  };
+
   useEffect(() => {
     if (outputRef.current) {
       outputRef.current.scrollTop = outputRef.current.scrollHeight;
@@ -151,11 +164,42 @@ export default function Terminal() {
     <>
       <Card className="w-full max-w-3xl bg-zinc-900 text-zinc-100 font-mono shadow-lg border border-zinc-700 overflow-hidden">
         <CardContent className="p-0">
-          <div className="flex items-center justify-start bg-zinc-800 px-4 py-2 border-b border-zinc-700 rounded-t-lg">
+          <div className="flex items-center justify-between bg-zinc-800 px-4 py-2 border-b border-zinc-700 rounded-t-lg">
             <div className="flex space-x-2">
               <div className="w-3 h-3 rounded-full bg-red-500"></div>
               <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
               <div className="w-3 h-3 rounded-full bg-green-500"></div>
+            </div>
+            <div className="flex items-center gap-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link
+                      href="/resume"
+                      className="p-1.5 text-zinc-400 hover:text-zinc-200 transition-colors rounded-md hover:bg-zinc-700/50"
+                    >
+                      <ExternalLinkIcon className="w-4 h-4" />
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>View Resume</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={handleDownload}
+                      className="p-1.5 text-zinc-400 hover:text-zinc-200 transition-colors rounded-md hover:bg-zinc-700/50"
+                    >
+                      <DownloadIcon className="w-4 h-4" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Download Resume</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </div>
           <div
@@ -163,7 +207,12 @@ export default function Terminal() {
             className="h-[60vh] p-4 overflow-auto whitespace-pre-wrap"
           >
             {output.map((line, index) => (
-              <div key={index} className={`mb-2 ${line.startsWith('$') ? 'text-zinc-500' : ''}`}>
+              <div
+                key={index}
+                className={`mb-2 ${
+                  line.startsWith("$") ? "text-zinc-500" : ""
+                }`}
+              >
                 {line}
               </div>
             ))}
