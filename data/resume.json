@@ -1,0 +1,38 @@
+{
+  "about": "I am a software developer with 5 years of experience in web technologies.",
+  "experience": [
+    {
+      "company": "TechCorp",
+      "position": "Software Engineer",
+      "duration": "2018-2021",
+      "description": "Worked on developing scalable web applications."
+    },
+    {
+      "company": "WebSolutions",
+      "position": "Senior Developer",
+      "duration": "2021-present",
+      "description": "Leading a team of developers in building client projects."
+    }
+  ],
+  "skills": {
+    "technical": ["JavaScript", "TypeScript", "React", "Node.js", "SQL"],
+    "soft": ["Communication", "Teamwork", "Problem-solving"]
+  },
+  "projects": [
+    {
+      "name": "E-commerce platform",
+      "description": "Built with React and Node.js"
+    },
+    {
+      "name": "Predictive maintenance model",
+      "description": "Developed a machine learning model."
+    }
+  ],
+  "education": {
+    "university": "Bachelor of Science in Computer Science, State University (2014-2018)",
+    "certifications": [
+      "AWS Certified Developer - Associate (2020)",
+      "Google Cloud Professional Cloud Architect (2021)"
+    ]
+  }
+}
