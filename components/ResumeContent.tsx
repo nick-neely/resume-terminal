@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { QuickMenu } from "./QuickMenu";
 import { Button } from "./ui/button";
 
 interface ResumeContentProps {
@@ -49,12 +50,14 @@ export function ResumeContent({ resume }: ResumeContentProps) {
 
   return (
     <PageTransition>
-      <main className="p-8">
+      <main className="p-8" data-resume-content>
         <div className="max-w-4xl mx-auto space-y-8">
           <motion.div
+            data-animate
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
+            className="no-print"
           >
             <Link
               href="/"
@@ -66,100 +69,61 @@ export function ResumeContent({ resume }: ResumeContentProps) {
           </motion.div>
 
           <motion.div
+            data-animate
             variants={cardVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-100px" }}
+            className="print-mt-0"
           >
-            {/* Header Section */}
-            <Card className="bg-zinc-900/50 border-zinc-700 hover:bg-zinc-900/70 transition-all">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-4 mb-4">
-                  <UserIcon className="w-8 h-8 text-zinc-400" />
-                  <div>
-                    <h1 className="text-2xl font-bold text-zinc-100">
-                      About Me
-                    </h1>
-                    <p className="text-zinc-300 mt-2">{resume.about}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            variants={cardVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-          >
-            {/* Experience Section */}
-            <Card className="bg-zinc-900/50 border-zinc-700 hover:bg-zinc-900/70 transition-all">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <BriefcaseIcon className="w-5 h-5 text-zinc-400" />
-                  <CardTitle className="text-xl text-zinc-100">
-                    Experience
-                  </CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {resume.experience.map((exp, index) => (
-                  <div
-                    key={index}
-                    className="p-4 rounded-lg hover:bg-zinc-800/50 transition-all hover:translate-x-1 group"
-                  >
-                    <h3 className="text-lg font-semibold text-zinc-100 group-hover:text-zinc-50">
-                      {exp.position}
-                    </h3>
-                    <p className="text-sm text-zinc-400">{exp.company}</p>
-                    <p className="text-zinc-300 mt-2">{exp.description}</p>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            variants={cardVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-          >
-            {/* Skills Section */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div data-section className="section-wrapper">
+              {/* Header Section */}
               <Card className="bg-zinc-900/50 border-zinc-700 hover:bg-zinc-900/70 transition-all">
-                <CardHeader>
-                  <CardTitle className="text-zinc-100">
-                    Technical Skills
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="flex flex-wrap gap-2">
-                  {resume.skills.technical.map((skill, index) => (
-                    <Badge
-                      key={index}
-                      variant="secondary"
-                      className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-zinc-100 transition-all hover:-translate-y-0.5 active:translate-y-0"
-                    >
-                      {skill}
-                    </Badge>
-                  ))}
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-4 mb-4">
+                    <UserIcon className="w-8 h-8 text-zinc-400" />
+                    <div>
+                      <h1 className="text-2xl font-bold text-zinc-100">
+                        About Me
+                      </h1>
+                      <p className="text-zinc-300 mt-2">{resume.about}</p>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
+            </div>
+          </motion.div>
 
+          <motion.div
+            data-animate
+            variants={cardVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+          >
+            <div data-section className="section-wrapper">
+              {/* Experience Section */}
               <Card className="bg-zinc-900/50 border-zinc-700 hover:bg-zinc-900/70 transition-all">
                 <CardHeader>
-                  <CardTitle className="text-zinc-100">Soft Skills</CardTitle>
+                  <div className="flex items-center gap-2">
+                    <BriefcaseIcon className="w-5 h-5 text-zinc-400" />
+                    <CardTitle className="text-xl text-zinc-100">
+                      Experience
+                    </CardTitle>
+                  </div>
                 </CardHeader>
-                <CardContent className="flex flex-wrap gap-2">
-                  {resume.skills.soft.map((skill, index) => (
-                    <Badge
+                <CardContent className="space-y-4">
+                  {resume.experience.map((exp, index) => (
+                    <div
                       key={index}
-                      variant="secondary"
-                      className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-zinc-100 transition-all hover:-translate-y-0.5 active:translate-y-0"
+                      className="p-4 rounded-lg hover:bg-zinc-800/50 transition-all hover:translate-x-1 group"
                     >
-                      {skill}
-                    </Badge>
+                      <h3 className="text-lg font-semibold text-zinc-100 group-hover:text-zinc-50">
+                        {exp.position}
+                      </h3>
+                      <p className="text-sm text-zinc-400">{exp.company}</p>
+                      <p className="text-zinc-300 mt-2">{exp.description}</p>
+                    </div>
                   ))}
                 </CardContent>
               </Card>
@@ -167,70 +131,125 @@ export function ResumeContent({ resume }: ResumeContentProps) {
           </motion.div>
 
           <motion.div
+            data-animate
             variants={cardVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-100px" }}
           >
-            {/* Projects Section */}
-            <Card className="bg-zinc-900/50 border-zinc-700 hover:bg-zinc-900/70 transition-all">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <FolderIcon className="w-5 h-5 text-zinc-400" />
-                  <CardTitle className="text-xl text-zinc-100">
-                    Projects
-                  </CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="grid gap-4">
-                {resume.projects.map((project, index) => (
-                  <div
-                    key={index}
-                    className="p-4 rounded-lg hover:bg-zinc-800/50 transition-all hover:translate-x-1 group"
-                  >
-                    <h3 className="text-lg font-semibold text-zinc-100 group-hover:text-zinc-50">
-                      {project.name}
-                    </h3>
-                    <p className="text-zinc-300 mt-2">{project.description}</p>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
+            <div data-section className="section-wrapper">
+              {/* Skills Section */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card className="bg-zinc-900/50 border-zinc-700 hover:bg-zinc-900/70 transition-all">
+                  <CardHeader>
+                    <CardTitle className="text-zinc-100">
+                      Technical Skills
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex flex-wrap gap-2">
+                    {resume.skills.technical.map((skill, index) => (
+                      <Badge
+                        key={index}
+                        variant="secondary"
+                        className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-zinc-100 transition-all hover:-translate-y-0.5 active:translate-y-0"
+                      >
+                        {skill}
+                      </Badge>
+                    ))}
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-zinc-900/50 border-zinc-700 hover:bg-zinc-900/70 transition-all">
+                  <CardHeader>
+                    <CardTitle className="text-zinc-100">Soft Skills</CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex flex-wrap gap-2">
+                    {resume.skills.soft.map((skill, index) => (
+                      <Badge
+                        key={index}
+                        variant="secondary"
+                        className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-zinc-100 transition-all hover:-translate-y-0.5 active:translate-y-0"
+                      >
+                        {skill}
+                      </Badge>
+                    ))}
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
           </motion.div>
 
           <motion.div
+            data-animate
             variants={cardVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-100px" }}
           >
-            {/* Education Section */}
-            <Card className="bg-zinc-900/50 border-zinc-700 hover:bg-zinc-900/70 transition-all">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <GraduationCapIcon className="w-5 h-5 text-zinc-400" />
-                  <CardTitle className="text-xl text-zinc-100">
-                    Education
-                  </CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-zinc-100 font-medium">
-                  {resume.education.university}
-                </p>
-                <Separator className="my-4 bg-zinc-700" />
-                <div className="space-y-2">
-                  {resume.education.certifications.map((cert, index) => (
-                    <p
+            <div data-section className="section-wrapper">
+              {/* Projects Section */}
+              <Card className="bg-zinc-900/50 border-zinc-700 hover:bg-zinc-900/70 transition-all">
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <FolderIcon className="w-5 h-5 text-zinc-400" />
+                    <CardTitle className="text-xl text-zinc-100">
+                      Projects
+                    </CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="grid gap-4">
+                  {resume.projects.map((project, index) => (
+                    <div
                       key={index}
-                      className="text-zinc-300 hover:text-zinc-100 transition-colors hover:translate-x-1 transform duration-200"
+                      className="p-4 rounded-lg hover:bg-zinc-800/50 transition-all hover:translate-x-1 group"
                     >
-                      {cert}
-                    </p>
+                      <h3 className="text-lg font-semibold text-zinc-100 group-hover:text-zinc-50">
+                        {project.name}
+                      </h3>
+                      <p className="text-zinc-300 mt-2">{project.description}</p>
+                    </div>
                   ))}
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
+          </motion.div>
+
+          <motion.div
+            data-animate
+            variants={cardVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+          >
+            <div data-section className="section-wrapper">
+              {/* Education Section */}
+              <Card className="bg-zinc-900/50 border-zinc-700 hover:bg-zinc-900/70 transition-all">
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <GraduationCapIcon className="w-5 h-5 text-zinc-400" />
+                    <CardTitle className="text-xl text-zinc-100">
+                      Education
+                    </CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-zinc-100 font-medium">
+                    {resume.education.university}
+                  </p>
+                  <Separator className="my-4 bg-zinc-700" />
+                  <div className="space-y-2">
+                    {resume.education.certifications.map((cert, index) => (
+                      <p
+                        key={index}
+                        className="text-zinc-300 hover:text-zinc-100 transition-colors hover:translate-x-1 transform duration-200"
+                      >
+                        {cert}
+                      </p>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </motion.div>
         </div>
         <Button
@@ -244,6 +263,7 @@ export function ResumeContent({ resume }: ResumeContentProps) {
         >
           <ArrowUpIcon className="w-5 h-5" />
         </Button>
+        <QuickMenu />
       </main>
     </PageTransition>
   );
