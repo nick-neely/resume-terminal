@@ -10,13 +10,14 @@ import {
   MenuIcon,
   PrinterIcon,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FeedbackForm } from "./FeedbackForm";
 import { Button } from "./ui/button";
 
 export function QuickMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const handlePrintToggle = () => {
     togglePrintMode();
@@ -31,14 +32,29 @@ export function QuickMenu() {
     window.open(url, "_blank");
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
+
   return (
     <motion.div className="fixed bottom-8 left-8 z-50 no-print">
-      <div
-        className="relative"
-        onMouseEnter={() => setIsOpen(true)}
-        onMouseLeave={() => setIsOpen(false)}
-      >
+      <div className="relative" ref={menuRef}>
         <Button
+          onClick={() => setIsOpen(!isOpen)}
           className="p-3 rounded-full bg-zinc-800 text-zinc-100 shadow-md hover:bg-zinc-700 hover:scale-110 active:scale-95 transition-all duration-200"
           size="icon"
         >
