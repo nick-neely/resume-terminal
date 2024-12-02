@@ -31,10 +31,10 @@ export function StatusLine({
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-2">
           <FolderIcon
-            className="w-4 h-4 hover:text-zinc-200 transition-colors cursor-pointer pointer-events-auto"
+            className="w-4 h-4 hover:text-zinc-200 hover:scale-110 active:scale-95 transition-all cursor-pointer pointer-events-auto"
             onClick={onHomeDirectory}
           />
-          <span>
+          <span className="transition-colors">
             {currentDirectory.length === 0
               ? "/"
               : "/" + currentDirectory.join("/")}

@@ -231,7 +231,7 @@ export default function Terminal() {
                 key={index}
                 className={`mb-2 ${
                   line.startsWith("$") ? "text-zinc-500" : ""
-                }`}
+                } ${index === 0 ? "animate-slide-in" : ""}`}
               >
                 {line}
               </div>
@@ -239,11 +239,11 @@ export default function Terminal() {
           </div>
           <form onSubmit={handleInputSubmit} className="border-t border-zinc-700">
             <div className="flex flex-col">
-              <div className="flex p-2 relative">
-                <span className="text-zinc-500 mr-2 shrink-0">$</span>
+              <div className="flex p-2 relative group">
+                <span className="text-zinc-500 mr-2 shrink-0 group-focus-within:text-zinc-300 transition-colors">$</span>
                 <div className="relative flex-grow">
                   {!hasUsedTab && (
-                    <span className="absolute right-2 top-0 text-xs text-zinc-600 pointer-events-none">
+                    <span className="absolute right-2 top-0 text-xs text-zinc-600 pointer-events-none animate-pulse">
                       Press Tab to autocomplete
                     </span>
                   )}
