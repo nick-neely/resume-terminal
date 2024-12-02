@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+.breadcrumb-separator {
+  @apply mx-1 text-zinc-600;
+}
+
 @layer base {
   :root {
     --background: 240 10% 3.9%;

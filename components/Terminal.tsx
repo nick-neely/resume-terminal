@@ -18,6 +18,7 @@ import {
 import { DownloadIcon, ExternalLinkIcon } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { StatusLine } from "./StatusLine";
 
 export default function Terminal() {
   const [isMobile, setIsMobile] = useState(false);
@@ -236,36 +237,43 @@ export default function Terminal() {
               </div>
             ))}
           </div>
-          <form
-            onSubmit={handleInputSubmit}
-            className="border-t border-zinc-700"
-          >
-            <div className="flex p-2 relative">
-              <span className="text-zinc-500 mr-2 shrink-0">$</span>
-              <div className="relative flex-grow min-h-[24px]">
-                {!hasUsedTab && (
-                  <span className="absolute right-2 top-0 text-xs text-zinc-600 pointer-events-none">
-                    Press Tab to autocomplete
+          <form onSubmit={handleInputSubmit} className="border-t border-zinc-700">
+            <div className="flex flex-col">
+              <div className="flex p-2 relative">
+                <span className="text-zinc-500 mr-2 shrink-0">$</span>
+                <div className="relative flex-grow">
+                  {!hasUsedTab && (
+                    <span className="absolute right-2 top-0 text-xs text-zinc-600 pointer-events-none">
+                      Press Tab to autocomplete
+                    </span>
+                  )}
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={input}
+                    onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    onPaste={handlePaste}
+                    spellCheck={false}
+                    autoCapitalize="none"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    className="absolute w-full h-6 bg-transparent border-none text-transparent focus:outline-none focus:ring-0"
+                  />
+                  <span className="whitespace-pre-wrap break-all">
+                    {input}
+                    <span className="animate-blink">▋</span>
                   </span>
-                )}
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={input}
-                  onChange={handleInputChange}
-                  onKeyDown={handleKeyDown}
-                  onPaste={handlePaste}
-                  spellCheck={false}
-                  autoCapitalize="none"
-                  autoComplete="off"
-                  autoCorrect="off"
-                  className="absolute w-full h-full bg-transparent border-none text-transparent focus:outline-none focus:ring-0"
-                />
-                <span className="whitespace-pre-wrap break-all">
-                  {input}
-                  <span className="animate-blink">▋</span>
-                </span>
+                </div>
               </div>
+              <StatusLine 
+                currentDirectory={vfs.currentPath} 
+                totalCommands={commandHistory.length}
+                isMobile={isMobile}
+                onHomeDirectory={() => {
+                  setVfs(prev => ({ ...prev, currentPath: [] }));
+                }}
+              />
             </div>
           </form>
         </CardContent>
