@@ -7,18 +7,36 @@ import { Separator } from "@/components/ui/separator";
 import { Resume } from "@/types/schema";
 import {
   ArrowLeftIcon,
+  ArrowUpIcon,
   BriefcaseIcon,
   FolderIcon,
   GraduationCapIcon,
   UserIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { Button } from "./ui/button";
 
 interface ResumeContentProps {
   resume: Resume;
 }
 
 export function ResumeContent({ resume }: ResumeContentProps) {
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 400);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <PageTransition>
       <main className="p-8">
@@ -162,6 +180,17 @@ export function ResumeContent({ resume }: ResumeContentProps) {
             </CardContent>
           </Card>
         </div>
+        <Button
+          onClick={scrollToTop}
+          className={`fixed bottom-8 right-8 p-3 rounded-full bg-zinc-800 text-zinc-100 shadow-md transition-all duration-200 hover:bg-zinc-700 hover:scale-110 active:scale-95 ${
+            showBackToTop
+              ? "translate-y-0 opacity-100"
+              : "translate-y-16 opacity-0"
+          }`}
+          aria-label="Scroll to top"
+        >
+          <ArrowUpIcon className="w-5 h-5" />
+        </Button>
       </main>
     </PageTransition>
   );
