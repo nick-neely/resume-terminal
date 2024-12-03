@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 
 interface StatusLineProps {
   currentDirectory: string[];
-  totalCommands: number;
+  validCommandCount: number;
   isMobile: boolean;
   onHomeDirectory: () => void;
   onRefresh: () => void;
@@ -14,7 +14,7 @@ interface StatusLineProps {
 
 export function StatusLine({
   currentDirectory,
-  totalCommands,
+  validCommandCount,
   isMobile,
   onHomeDirectory,
   onRefresh,
@@ -52,7 +52,7 @@ export function StatusLine({
         <div className="flex items-center gap-2">
           <Terminal className="w-4 h-4" />
           <span>
-            {totalCommands} cmd{totalCommands !== 1 ? "s" : ""}
+            {validCommandCount} cmd{validCommandCount !== 1 ? "s" : ""}
           </span>
         </div>
       </div>

@@ -10,6 +10,7 @@ import {
 import { commands } from "@/types/commands";
 import { executeCommand, parseCommand } from "@/utils/commandParser";
 import { downloadFile } from "@/utils/downloadFile";
+import { isValidCommand } from "@/utils/statusUtils";
 import { getCurrentDirectory, initialVFS } from "@/utils/virtualFileSystem";
 import {
   desktopWelcomeMessage,
@@ -69,7 +70,9 @@ export default function Terminal() {
     }
 
     setVfs(updatedVfs);
-    setCommandHistory((prev) => [...prev, input]);
+    if (isValidCommand(input, commands)) {
+      setCommandHistory((prev) => [...prev, input]);
+    }
     setHistoryIndex(null);
     setInput("");
   };
@@ -284,7 +287,7 @@ export default function Terminal() {
               </div>
               <StatusLine
                 currentDirectory={vfs.currentPath}
-                totalCommands={commandHistory.length}
+                validCommandCount={commandHistory.length}
                 isMobile={isMobile}
                 onHomeDirectory={() => {
                   setVfs((prev) => ({ ...prev, currentPath: [] }));
