@@ -20,7 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { MessagesSquareIcon } from "lucide-react";
+import { MessageSquareIcon } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -58,81 +58,83 @@ export function FeedbackForm() {
   };
 
   return (
-    <>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button size="default" variant="ghost">
-            <MessagesSquareIcon className="w-4 h-4" />
-            <span className="text-xs">Feedback</span>
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px] bg-zinc-900 border-zinc-800">
-          <DialogHeader>
-            <DialogTitle className="text-zinc-100">Send Feedback</DialogTitle>
-            <DialogDescription className="text-zinc-400">
-              Share your thoughts or get in touch directly.
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-zinc-200">Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="your@email.com"
-                        className="bg-zinc-800 border-zinc-700 text-zinc-100"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="subject"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-zinc-200">Subject</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Feedback subject"
-                        className="bg-zinc-800 border-zinc-700 text-zinc-100"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="message"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-zinc-200">Message</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Your message..."
-                        className="bg-zinc-800 border-zinc-700 text-zinc-100 min-h-[100px]"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full">
-                Send Feedback
-              </Button>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-    </>
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button
+          variant="ghost"
+          className="w-full justify-start"
+          size="default"
+        >
+          <MessageSquareIcon className="w-4 h-4 mr-2" />
+          <span className="text-sm">Feedback</span>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="bg-zinc-900 border-zinc-700">
+        <DialogHeader>
+          <DialogTitle className="text-zinc-100">Send Feedback</DialogTitle>
+          <DialogDescription className="text-zinc-400">
+            Share your thoughts or get in touch directly.
+          </DialogDescription>
+        </DialogHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-zinc-200">Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="your@email.com"
+                      className="bg-zinc-800 border-zinc-700 text-zinc-100"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="subject"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-zinc-200">Subject</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Feedback subject"
+                      className="bg-zinc-800 border-zinc-700 text-zinc-100"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="message"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-zinc-200">Message</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Your message..."
+                      className="bg-zinc-800 border-zinc-700 text-zinc-100 min-h-[100px]"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" className="w-full">
+              Send Feedback
+            </Button>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 }
