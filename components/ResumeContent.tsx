@@ -18,6 +18,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { QuickMenu } from "./QuickMenu";
 import { Button } from "./ui/button";
+import { ScrollProgress } from "./ScrollProgress";
 
 interface ResumeContentProps {
   resume: Resume;
@@ -50,6 +51,7 @@ export function ResumeContent({ resume }: ResumeContentProps) {
 
   return (
     <PageTransition>
+      <ScrollProgress />
       <main className="p-8" data-resume-content>
         <div className="max-w-4xl mx-auto space-y-8">
           <motion.div
