@@ -1,0 +1,53 @@
+@media print {
+  [data-resume-content].print-mode {
+    background: white;
+  }
+
+  [data-resume-content].print-mode * {
+    color: black !important;
+    background: transparent !important;
+    border-color: #ddd !important;
+  }
+
+  [data-resume-content].print-mode .no-print {
+    display: none !important;
+  }
+
+  [data-resume-content].print-mode .print-mt-0 {
+    margin-top: 0 !important;
+  }
+
+  [data-resume-content].print-mode {
+    padding-top: 0 !important;
+  }
+
+  [data-resume-content].print-mode [data-animate] {
+    opacity: 1 !important;
+    transform: none !important;
+    visibility: visible !important;
+    animation: none !important;
+  }
+
+  [data-resume-content].print-mode [data-section] {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  [data-resume-content].print-mode .section-wrapper {
+    display: block;
+    page-break-inside: avoid;
+  }
+}
+
+@media screen {
+  [data-resume-content].print-mode {
+    background: white;
+    color: black;
+  }
+
+  [data-resume-content].print-mode * {
+    color: black !important;
+    background: white !important;
+    border-color: #ddd !important;
+  }
+}
