@@ -23,8 +23,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { MessageSquareIcon } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 import { toast } from "sonner";
+import * as z from "zod";
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -58,13 +58,9 @@ export function FeedbackForm() {
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          className="w-full justify-start"
-          size="default"
-        >
+        <Button variant="ghost" className="w-full justify-start" size="default">
           <MessageSquareIcon className="w-4 h-4 mr-2" />
           <span className="text-sm">Feedback</span>
         </Button>

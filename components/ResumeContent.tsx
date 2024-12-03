@@ -17,8 +17,8 @@ import {
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { QuickMenu } from "./QuickMenu";
-import { Button } from "./ui/button";
 import { ScrollProgress } from "./ScrollProgress";
+import { Button } from "./ui/button";
 
 interface ResumeContentProps {
   resume: Resume;
@@ -208,7 +208,9 @@ export function ResumeContent({ resume }: ResumeContentProps) {
                       <h3 className="text-lg font-semibold text-zinc-100 group-hover:text-zinc-50">
                         {project.name}
                       </h3>
-                      <p className="text-zinc-300 mt-2">{project.description}</p>
+                      <p className="text-zinc-300 mt-2">
+                        {project.description}
+                      </p>
                     </div>
                   ))}
                 </CardContent>
@@ -256,7 +258,7 @@ export function ResumeContent({ resume }: ResumeContentProps) {
         </div>
         <Button
           onClick={scrollToTop}
-          className={`fixed bottom-8 right-8 p-3 rounded-full bg-zinc-800 text-zinc-100 shadow-md transition-all duration-200 hover:bg-zinc-700 hover:scale-110 active:scale-95 ${
+          className={`fixed bottom-8 right-8 p-3 rounded-full bg-zinc-800 text-zinc-100 shadow-md transition-all duration-200 hover:bg-zinc-700 hover:scale-110 active:scale-95 hidden md:block ${
             showBackToTop
               ? "translate-y-0 opacity-100"
               : "translate-y-16 opacity-0"
