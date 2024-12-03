@@ -42,7 +42,6 @@ Each section is represented as an object or array of objects within the main res
     "summary": "Passionate developer with 5+ years of experience in building web applications."
   }
 }
-
 ```
 
 ### **2.1.2. Employment History**
@@ -76,7 +75,6 @@ Each section is represented as an object or array of objects within the main res
     }
   ]
 }
-
 ```
 
 ### **2.1.3. Projects**
@@ -100,7 +98,6 @@ Each section is represented as an object or array of objects within the main res
     }
   ]
 }
-
 ```
 
 ### **2.1.4. Skills**
@@ -109,13 +106,22 @@ Each section is represented as an object or array of objects within the main res
 {
   "skills": {
     "programmingLanguages": ["JavaScript", "TypeScript", "Python", "Go"],
-    "frameworksAndLibraries": ["React", "Next.js", "Node.js", "Express", "Tailwind CSS"],
+    "frameworksAndLibraries": [
+      "React",
+      "Next.js",
+      "Node.js",
+      "Express",
+      "Tailwind CSS"
+    ],
     "databases": ["MongoDB", "PostgreSQL", "Redis"],
     "toolsAndPlatforms": ["Git", "Docker", "Kubernetes", "AWS", "Jest"],
-    "otherSkills": ["Agile Methodologies", "Team Leadership", "Technical Writing"]
+    "otherSkills": [
+      "Agile Methodologies",
+      "Team Leadership",
+      "Technical Writing"
+    ]
   }
 }
-
 ```
 
 ### **2.1.5. Education**
@@ -129,14 +135,10 @@ Each section is represented as an object or array of objects within the main res
       "location": "Anytown, USA",
       "startDate": "2012-09",
       "endDate": "2016-06",
-      "details": [
-        "Graduated Magna Cum Laude",
-        "Member of the Programming Club"
-      ]
+      "details": ["Graduated Magna Cum Laude", "Member of the Programming Club"]
     }
   ]
 }
-
 ```
 
 ### **2.1.6. Certifications**
@@ -153,7 +155,6 @@ Each section is represented as an object or array of objects within the main res
     }
   ]
 }
-
 ```
 
 ### **2.2. Configuration Schema**
@@ -173,7 +174,6 @@ Configuration settings allow users to customize the application's appearance and
     "enableSound": false // Toggle terminal sound effects
   }
 }
-
 ```
 
 ### **2.2.2. Custom Commands**
@@ -200,7 +200,6 @@ Users can define custom commands to enhance functionality.
     }
   ]
 }
-
 ```
 
 ### **2.3. Command Definitions Schema**
@@ -259,7 +258,6 @@ Defines standard terminal commands and their behaviors.
     // Additional commands can be added here.
   ]
 }
-
 ```
 
 ### **3. Directory Structure**
@@ -327,8 +325,8 @@ The resume data is mapped to a virtual file system to emulate directory navigati
 ### **4. Data Access and Navigation**
 
 - **Accessing Data**: Users navigate the virtual file system using commands like `cd`, `ls`, and `cat` to access and display data.
-    - Example: `cd employmentHistory/Innovatech Solutions` navigates to the directory containing details about that employment.
-    - `cat responsibilities.txt` displays the responsibilities at the current employment.
+  - Example: `cd employmentHistory/Innovatech Solutions` navigates to the directory containing details about that employment.
+  - `cat responsibilities.txt` displays the responsibilities at the current employment.
 - **Custom Commands**: Custom commands execute predefined actions, such as displaying social links or opening external URLs.
 
 ### **5. Schema Validation**
@@ -369,7 +367,6 @@ Implement schema validation to ensure data integrity.
     }
   }
 }
-
 ```
 
 ### **6. Extensibility**
@@ -384,70 +381,87 @@ An example `resume.json` configuration file:
 
 ```json
 {
-  "personalInfo": { /* Personal Information */ },
-  "employmentHistory": [ /* Employment History */ ],
-  "projects": [ /* Projects */ ],
-  "skills": { /* Skills */ },
-  "education": [ /* Education */ ],
-  "certifications": [ /* Certifications */ ],
-  "settings": { /* Application Settings */ },
-  "customCommands": [ /* Custom Commands */ ],
-  "commandDefinitions": [ /* Command Definitions */ ]
+  "personalInfo": {
+    /* Personal Information */
+  },
+  "employmentHistory": [
+    /* Employment History */
+  ],
+  "projects": [
+    /* Projects */
+  ],
+  "skills": {
+    /* Skills */
+  },
+  "education": [
+    /* Education */
+  ],
+  "certifications": [
+    /* Certifications */
+  ],
+  "settings": {
+    /* Application Settings */
+  },
+  "customCommands": [
+    /* Custom Commands */
+  ],
+  "commandDefinitions": [
+    /* Command Definitions */
+  ]
 }
-
 ```
 
 ### **8. Data Parsing and Initialization**
 
 - **Startup Process**:
-    - Load the `resume.json` file.
-    - Validate the data against the schemas.
-    - Build an in-memory representation of the virtual file system.
+  - Load the `resume.json` file.
+  - Validate the data against the schemas.
+  - Build an in-memory representation of the virtual file system.
 - **Error Handling**:
-    - If validation fails, display error messages indicating the issues.
-    - Provide default values for optional settings if not specified.
+  - If validation fails, display error messages indicating the issues.
+  - Provide default values for optional settings if not specified.
 
 ### **9. Internationalization (Optional)**
 
 - **Localization Support**:
-    - Include a `locale` setting in `settings` (e.g., `"locale": "en-US"`).
-    - Structure text content to support multiple languages, possibly using key-value pairs for translations.
+  - Include a `locale` setting in `settings` (e.g., `"locale": "en-US"`).
+  - Structure text content to support multiple languages, possibly using key-value pairs for translations.
 - **Date Formatting**:
-    - Use the `dateFormat` setting to display dates according to the specified locale.
+  - Use the `dateFormat` setting to display dates according to the specified locale.
 
 ### **10. Security Considerations**
 
 - **Input Sanitization**:
-    - Sanitize all user inputs to prevent injection attacks.
+  - Sanitize all user inputs to prevent injection attacks.
 - **Content Security Policy**:
-    - Apply appropriate security headers to prevent cross-site scripting (XSS) and other vulnerabilities.
+  - Apply appropriate security headers to prevent cross-site scripting (XSS) and other vulnerabilities.
 - **External Links**:
-    - When opening external URLs, ensure they are validated and safe.
+  - When opening external URLs, ensure they are validated and safe.
 
 ### **11. Example Usage Scenarios**
 
 - **Navigating to a Project**:
-    - Commands:
-        - `cd projects/ResumeTerminal`
-        - `ls` (lists files like `description.txt`, `technologies.txt`)
-        - `cat description.txt` (displays the project description)
+  - Commands:
+    - `cd projects/ResumeTerminal`
+    - `ls` (lists files like `description.txt`, `technologies.txt`)
+    - `cat description.txt` (displays the project description)
 - **Viewing Contact Information**:
-    - Commands:
-        - `cd personalInfo/contact`
-        - `ls` (lists contact methods)
-        - `cat email.txt` (displays the email address)
+  - Commands:
+    - `cd personalInfo/contact`
+    - `ls` (lists contact methods)
+    - `cat email.txt` (displays the email address)
 - **Using a Custom Command**:
-    - Command:
-        - `social` (displays social media links defined in `customCommands`)
+  - Command:
+    - `social` (displays social media links defined in `customCommands`)
 
 ### **12. Future Enhancements**
 
 - **Dynamic Data Fetching**:
-    - Support fetching data from APIs or external sources.
+  - Support fetching data from APIs or external sources.
 - **Plugin System**:
-    - Allow users to add plugins that extend functionality, such as fetching live GitHub statistics.
+  - Allow users to add plugins that extend functionality, such as fetching live GitHub statistics.
 - **Advanced Theming**:
-    - Enable users to define custom themes with more granular control over styles.
+  - Enable users to define custom themes with more granular control over styles.
 
 ---
 
