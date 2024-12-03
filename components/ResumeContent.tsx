@@ -81,16 +81,14 @@ export function ResumeContent({ resume }: ResumeContentProps) {
             <div data-section className="section-wrapper">
               {/* Header Section */}
               <Card className="bg-zinc-900/50 border-zinc-700 hover:bg-zinc-900/70 transition-all">
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-4 mb-4">
-                    <UserIcon className="w-8 h-8 text-zinc-400" />
-                    <div>
-                      <h1 className="text-2xl font-bold text-zinc-100">
-                        About Me
-                      </h1>
-                      <p className="text-zinc-300 mt-2">{resume.about}</p>
-                    </div>
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <UserIcon className="w-5 h-5 text-zinc-400" />
+                    <CardTitle className="text-xl text-zinc-100">About Me</CardTitle>
                   </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-zinc-300">{resume.about}</p>
                 </CardContent>
               </Card>
             </div>

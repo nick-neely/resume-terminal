@@ -62,32 +62,37 @@ export function FeedbackForm() {
       <DialogTrigger asChild>
         <Button variant="ghost" className="w-full justify-start" size="default">
           <MessageSquareIcon className="w-4 h-4 mr-2" />
-          <span className="text-sm">Feedback</span>
+          <span className="text-base">Feedback</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="bg-zinc-900 border-zinc-700">
         <DialogHeader>
-          <DialogTitle className="text-zinc-100">Send Feedback</DialogTitle>
-          <DialogDescription className="text-zinc-400">
+          <DialogTitle className="text-zinc-100 text-xl">
+            Send Feedback
+          </DialogTitle>
+          <DialogDescription className="text-zinc-400 text-base">
             Share your thoughts or get in touch directly.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-zinc-200">Email</FormLabel>
+                  <FormLabel className="text-zinc-200 text-base">
+                    Email
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="your@email.com"
-                      className="bg-zinc-800 border-zinc-700 text-zinc-100"
+                      className="bg-zinc-800 border-zinc-700 text-zinc-100 h-12 px-4 text-base
+                      hover:bg-zinc-800/70 focus:bg-zinc-800/70 transition-colors"
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-base" />
                 </FormItem>
               )}
             />
@@ -96,15 +101,18 @@ export function FeedbackForm() {
               name="subject"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-zinc-200">Subject</FormLabel>
+                  <FormLabel className="text-zinc-200 text-base">
+                    Subject
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Feedback subject"
-                      className="bg-zinc-800 border-zinc-700 text-zinc-100"
+                      className="bg-zinc-800 border-zinc-700 text-zinc-100 h-12 px-4 text-base
+                      hover:bg-zinc-800/70 focus:bg-zinc-800/70 transition-colors"
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-base" />
                 </FormItem>
               )}
             />
@@ -113,19 +121,25 @@ export function FeedbackForm() {
               name="message"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-zinc-200">Message</FormLabel>
+                  <FormLabel className="text-zinc-200 text-base">
+                    Message
+                  </FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Your message..."
-                      className="bg-zinc-800 border-zinc-700 text-zinc-100 min-h-[100px]"
+                      className="bg-zinc-800 border-zinc-700 text-zinc-100 min-h-[120px] p-4 text-base
+                      hover:bg-zinc-800/70 focus:bg-zinc-800/70 transition-colors"
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-base" />
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full">
+            <Button
+              type="submit"
+              className="w-full h-12 text-base hover:opacity-90 active:scale-[0.98] transition-all"
+            >
               Send Feedback
             </Button>
           </form>
