@@ -1,9 +1,9 @@
 # ResumeTerminal
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Next.js](https://img.shields.io/badge/next.js-15.0.0-blue)
-![React](https://img.shields.io/badge/react-19.0.0-blue)
-![Tailwind CSS](https://img.shields.io/badge/tailwindcss-^3.0-blue)
+![Next.js](https://img.shields.io/badge/next.js-14.2.16-blue)
+![React](https://img.shields.io/badge/react-18.0.0-blue)
+![Tailwind CSS](https://img.shields.io/badge/tailwindcss-^3.4-blue)
 ![shadcn/ui](https://img.shields.io/badge/shadcn%2Fui-^1.0-blue)
 
 **ResumeTerminal** is an open-source, command-line-based personal resume application that emulates a modern terminal interface. Designed for tech-savvy individuals, product owners, and developers, it allows users to navigate through resume sections such as Employment History, Projects, and Skills using standard terminal commands.
