@@ -1,9 +1,9 @@
 import { Toaster } from "@/components/ui/sonner";
+import { config } from "@/config";
 import "@/styles/print.css";
 import type { Metadata } from "next";
 import { Fira_Code, Inter } from "next/font/google";
 import "./globals.css";
-import { config } from "@/config";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const firaCode = Fira_Code({
@@ -11,15 +11,16 @@ const firaCode = Fira_Code({
   variable: "--font-fira-code",
 });
 
-export const title = config.name.full;
-export const url = config.seo.url;
+const title = config.name.full;
+const shortTitle = config.name.short;
+const url = config.seo.url;
 const description = config.seo.description;
 
 export const metadata: Metadata = {
   metadataBase: new URL(url),
   title: {
     default: title,
-    template: `%s | ${title}`,
+    template: `%s | ${shortTitle}`,
   },
   applicationName: title,
   description: description,

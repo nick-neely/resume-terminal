@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { url } from "./layout";
+import { config } from "@/config";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -8,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: "/admin/**",
     },
-    sitemap: `${url}sitemap.xml`,
+    sitemap: `${config.seo.url}sitemap.xml`,
   };
 }

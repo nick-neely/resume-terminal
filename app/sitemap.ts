@@ -1,10 +1,10 @@
+import { config } from "@/config";
 import type { MetadataRoute } from "next";
-import { url } from "./layout";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
-      url: `${url}`,
+      url: `${config.seo.url}`,
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 1,
