@@ -237,10 +237,15 @@ export default function Terminal() {
               </div>
             ))}
           </div>
-          <form onSubmit={handleInputSubmit} className="border-t border-zinc-700">
+          <form
+            onSubmit={handleInputSubmit}
+            className="border-t border-zinc-700"
+          >
             <div className="flex flex-col">
               <div className="flex p-2 relative group">
-                <span className="text-zinc-500 mr-2 shrink-0 group-focus-within:text-zinc-300 transition-colors">$</span>
+                <span className="text-zinc-500 mr-2 shrink-0 group-focus-within:text-zinc-300 transition-colors">
+                  $
+                </span>
                 <div className="relative flex-grow">
                   {!hasUsedTab && (
                     <span className="absolute right-2 top-0 text-xs text-zinc-600 pointer-events-none animate-pulse">
@@ -258,7 +263,7 @@ export default function Terminal() {
                     autoCapitalize="none"
                     autoComplete="off"
                     autoCorrect="off"
-                    className="absolute w-full h-6 bg-transparent border-none text-transparent focus:outline-none focus:ring-0"
+                    className="absolute w-full h-6 bg-transparent border-none text-transparent focus:outline-none focus:ring-0 caret-transparent"
                   />
                   <span className="whitespace-pre-wrap break-all">
                     {input}
@@ -266,12 +271,12 @@ export default function Terminal() {
                   </span>
                 </div>
               </div>
-              <StatusLine 
-                currentDirectory={vfs.currentPath} 
+              <StatusLine
+                currentDirectory={vfs.currentPath}
                 totalCommands={commandHistory.length}
                 isMobile={isMobile}
                 onHomeDirectory={() => {
-                  setVfs(prev => ({ ...prev, currentPath: [] }));
+                  setVfs((prev) => ({ ...prev, currentPath: [] }));
                 }}
               />
             </div>
