@@ -3,6 +3,7 @@ import "@/styles/print.css";
 import type { Metadata } from "next";
 import { Fira_Code, Inter } from "next/font/google";
 import "./globals.css";
+import { config } from "@/config";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const firaCode = Fira_Code({
@@ -10,9 +11,39 @@ const firaCode = Fira_Code({
   variable: "--font-fira-code",
 });
 
+export const title = config.name.full;
+export const url = config.seo.url;
+const description = config.seo.description;
+
 export const metadata: Metadata = {
-  title: "ResumeTerminal",
-  description: "A modern, command-line interface for your resume",
+  metadataBase: new URL(url),
+  title: {
+    default: title,
+    template: `%s | ${title}`,
+  },
+  applicationName: title,
+  description: description,
+  category: config.seo.category,
+  keywords: config.seo.keywords,
+  authors: [{ name: config.seo.author.name }, { url: config.seo.author.url }],
+  creator: config.seo.creator,
+  publisher: config.seo.publisher,
+  openGraph: {
+    title: title,
+    description: description,
+    url: url,
+    siteName: title,
+    images: [
+      {
+        url: `${url}api/og`,
+        width: 1200,
+        height: 630,
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  manifest: `${url}manifest.json`,
 };
 
 export default function RootLayout({
