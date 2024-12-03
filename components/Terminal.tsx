@@ -169,6 +169,17 @@ export default function Terminal() {
     downloadFile("resume.pdf");
   };
 
+  const handleRefresh = useCallback(() => {
+    setInput("");
+    setOutput([
+      window.innerWidth < 768 ? mobileWelcomeMessage : desktopWelcomeMessage,
+    ]);
+    setCommandHistory([]);
+    setVfs(initialVFS);
+    setHasUsedTab(false);
+    inputRef.current?.focus();
+  }, []);
+
   useEffect(() => {
     if (outputRef.current) {
       outputRef.current.scrollTop = outputRef.current.scrollHeight;
@@ -278,6 +289,7 @@ export default function Terminal() {
                 onHomeDirectory={() => {
                   setVfs((prev) => ({ ...prev, currentPath: [] }));
                 }}
+                onRefresh={handleRefresh}
               />
             </div>
           </form>
