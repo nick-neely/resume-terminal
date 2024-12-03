@@ -9,21 +9,42 @@ import {
 } from "@/components/ui/tooltip";
 import { commands } from "@/types/commands";
 import { executeCommand, parseCommand } from "@/utils/commandParser";
+import { downloadFile } from "@/utils/downloadFile";
+import { isValidCommand } from "@/utils/statusUtils";
 import { getCurrentDirectory, initialVFS } from "@/utils/virtualFileSystem";
-import { welcomeMessage } from "@/utils/welcomeMessage";
+import {
+  desktopWelcomeMessage,
+  mobileWelcomeMessage,
+} from "@/utils/welcomeMessage";
 import { DownloadIcon, ExternalLinkIcon } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { downloadFile } from "@/utils/downloadFile";
+import { StatusLine } from "./StatusLine";
 
 export default function Terminal() {
+  const [isMobile, setIsMobile] = useState(false);
   const [input, setInput] = useState("");
-  const [output, setOutput] = useState<string[]>([welcomeMessage]);
+  const [output, setOutput] = useState<string[]>([]);
   const outputRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [, setHistoryIndex] = useState<number | null>(null);
   const [vfs, setVfs] = useState(initialVFS);
+  const [hasUsedTab, setHasUsedTab] = useState(false);
+
+  useEffect(() => {
+    const checkWidth = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkWidth();
+    setOutput([
+      window.innerWidth < 768 ? mobileWelcomeMessage : desktopWelcomeMessage,
+    ]);
+
+    window.addEventListener("resize", checkWidth);
+    return () => window.removeEventListener("resize", checkWidth);
+  }, []);
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,7 +70,9 @@ export default function Terminal() {
     }
 
     setVfs(updatedVfs);
-    setCommandHistory((prev) => [...prev, input]);
+    if (isValidCommand(input, commands)) {
+      setCommandHistory((prev) => [...prev, input]);
+    }
     setHistoryIndex(null);
     setInput("");
   };
@@ -67,16 +90,15 @@ export default function Terminal() {
       const lastPart = inputParts[inputParts.length - 1];
 
       if (inputParts.length === 1 && lastPart !== "") {
-        // Autocomplete command
         const matchingCommands = Object.keys(commands).filter((cmd) =>
           cmd.startsWith(lastPart)
         );
         if (matchingCommands.length === 1) {
           inputParts[0] = matchingCommands[0];
           setInput(inputParts.join(" "));
+          setHasUsedTab(true);
         }
       } else {
-        // Autocomplete file or directory
         try {
           const currentDir = getCurrentDirectory(vfs);
           const options = currentDir.children
@@ -88,6 +110,7 @@ export default function Terminal() {
           if (matchingOptions.length === 1) {
             inputParts[inputParts.length - 1] = matchingOptions[0];
             setInput(inputParts.join(" "));
+            setHasUsedTab(true);
           }
         } catch (error) {
           console.error("Error while autocompleting path:", error);
@@ -146,8 +169,19 @@ export default function Terminal() {
   );
 
   const handleDownload = () => {
-    downloadFile('resume.pdf');
+    downloadFile("resume.pdf");
   };
+
+  const handleRefresh = useCallback(() => {
+    setInput("");
+    setOutput([
+      window.innerWidth < 768 ? mobileWelcomeMessage : desktopWelcomeMessage,
+    ]);
+    setCommandHistory([]);
+    setVfs(initialVFS);
+    setHasUsedTab(false);
+    inputRef.current?.focus();
+  }, []);
 
   useEffect(() => {
     if (outputRef.current) {
@@ -211,7 +245,7 @@ export default function Terminal() {
                 key={index}
                 className={`mb-2 ${
                   line.startsWith("$") ? "text-zinc-500" : ""
-                }`}
+                } ${index === 0 ? "animate-slide-in" : ""}`}
               >
                 {line}
               </div>
@@ -221,27 +255,45 @@ export default function Terminal() {
             onSubmit={handleInputSubmit}
             className="border-t border-zinc-700"
           >
-            <div className="flex p-2">
-              <span className="text-zinc-500 mr-2 shrink-0">$</span>
-              <div className="relative flex-grow min-h-[24px]">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={input}
-                  onChange={handleInputChange}
-                  onKeyDown={handleKeyDown}
-                  onPaste={handlePaste}
-                  spellCheck={false}
-                  autoCapitalize="none"
-                  autoComplete="off"
-                  autoCorrect="off"
-                  className="absolute w-full h-full bg-transparent border-none text-transparent focus:outline-none focus:ring-0"
-                />
-                <span className="whitespace-pre-wrap break-all">
-                  {input}
-                  <span className="animate-blink">▋</span>
+            <div className="flex flex-col">
+              <div className="flex p-2 relative group">
+                <span className="text-zinc-500 mr-2 shrink-0 group-focus-within:text-zinc-300 transition-colors">
+                  $
                 </span>
+                <div className="relative flex-grow">
+                  {!hasUsedTab && (
+                    <span className="absolute right-2 top-0 text-xs text-zinc-600 pointer-events-none animate-pulse">
+                      Press Tab to autocomplete
+                    </span>
+                  )}
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={input}
+                    onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    onPaste={handlePaste}
+                    spellCheck={false}
+                    autoCapitalize="none"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    className="absolute w-full h-6 bg-transparent border-none text-transparent focus:outline-none focus:ring-0 caret-transparent"
+                  />
+                  <span className="whitespace-pre-wrap break-all">
+                    {input}
+                    <span className="animate-blink">▋</span>
+                  </span>
+                </div>
               </div>
+              <StatusLine
+                currentDirectory={vfs.currentPath}
+                validCommandCount={commandHistory.length}
+                isMobile={isMobile}
+                onHomeDirectory={() => {
+                  setVfs((prev) => ({ ...prev, currentPath: [] }));
+                }}
+                onRefresh={handleRefresh}
+              />
             </div>
           </form>
         </CardContent>
