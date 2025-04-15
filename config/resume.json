@@ -5,7 +5,7 @@
       "company": "Lean Techniques",
       "position": "Professional Software Consultant",
       "duration": "August 2024 - Present",
-      "description": "Developing solutions using TypeScript, React, and .NET. Key projects include modernizing legacy systems and creating scalable web applications with cloud integration."
+      "description": "Developing solutions using TypeScript, React, Vue, and .NET. Key projects include modernizing legacy systems and creating scalable web applications with cloud integration."
     },
     {
       "company": "Lean Techniques",
@@ -25,11 +25,11 @@
       "TypeScript",
       "React",
       "Next.js",
+      "Vue",
       "C#",
+      ".NET",
       "Python",
-      "AWS",
-      "Azure",
-      "Postgres",
+      "SQL",
       "TailwindCSS",
       "shadcn/ui"
     ],
