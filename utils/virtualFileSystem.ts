@@ -1,5 +1,3 @@
-import { ResumeSchema } from "@/types/schema";
-import resumeData from "../config/resume.json";
 import { getResumeData } from "./resumeParser";
 
 type FileContent = string;
@@ -57,6 +55,15 @@ try {
                 )
               ),
             },
+            ...(parsedResume.personalInfo.currentEmployer
+              ? {
+                  "currentEmployer.txt": {
+                    name: "currentEmployer.txt",
+                    type: "file",
+                    content: parsedResume.personalInfo.currentEmployer,
+                  },
+                }
+              : {}),
           },
         },
         "about.txt": {
