@@ -1,7 +1,15 @@
-
 import { z } from "zod";
 
 export const ResumeSchema = z.object({
+  personalInfo: z.object({
+    name: z.string(),
+    email: z.string(),
+    links: z.object({
+      github: z.string().url().optional(),
+      linkedin: z.string().url().optional(),
+      website: z.string().url().optional(),
+    }),
+  }),
   about: z.string(),
   experience: z.array(
     z.object({

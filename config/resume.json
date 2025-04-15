@@ -1,4 +1,13 @@
 {
+  "personalInfo": {
+    "name": "Your Name",
+    "email": "your.email@example.com",
+    "links": {
+      "github": "https://github.com/yourusername",
+      "linkedin": "https://linkedin.com/in/yourprofile",
+      "website": "https://yourwebsite.com"
+    }
+  },
   "about": "Full-stack developer leveraging expertise in TypeScript, React, and front-end technologies to contribute innovative solutions and grow in a dynamic environment.",
   "experience": [
     {
