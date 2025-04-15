@@ -1,5 +1,3 @@
-import { ResumeSchema } from "@/types/schema";
-import resumeData from "../config/resume.json";
 import { getResumeData } from "./resumeParser";
 
 type FileContent = string;
@@ -27,6 +25,47 @@ try {
       name: "/",
       type: "directory",
       children: {
+        personalInfo: {
+          name: "personalInfo",
+          type: "directory",
+          children: {
+            "name.txt": {
+              name: "name.txt",
+              type: "file",
+              content: parsedResume.personalInfo.name,
+            },
+            "title.txt": {
+              name: "title.txt",
+              type: "file",
+              content: parsedResume.personalInfo.title,
+            },
+            contact: {
+              name: "contact",
+              type: "directory",
+              children: Object.fromEntries(
+                Object.entries(parsedResume.personalInfo.contact).map(
+                  ([key, value]) => [
+                    `${key}.txt`,
+                    {
+                      name: `${key}.txt`,
+                      type: "file",
+                      content: value || "",
+                    },
+                  ]
+                )
+              ),
+            },
+            ...(parsedResume.personalInfo.currentEmployer
+              ? {
+                  "currentEmployer.txt": {
+                    name: "currentEmployer.txt",
+                    type: "file",
+                    content: parsedResume.personalInfo.currentEmployer,
+                  },
+                }
+              : {}),
+          },
+        },
         "about.txt": {
           name: "about.txt",
           type: "file",
@@ -36,12 +75,38 @@ try {
           name: "experience",
           type: "directory",
           children: Object.fromEntries(
-            parsedResume.experience.map((exp, index) => [
-              `job${index + 1}.txt`,
+            parsedResume.experience.map((job, index) => [
+              `${job.company.replace(/\s+/g, "_")}_${index + 1}`,
               {
-                name: `job${index + 1}.txt`,
-                type: "file",
-                content: `${exp.position} at ${exp.company} (${exp.duration})\n${exp.description}`,
+                name: `${job.company.replace(/\s+/g, "_")}_${index + 1}`,
+                type: "directory",
+                children: {
+                  "position.txt": {
+                    name: "position.txt",
+                    type: "file",
+                    content: job.position,
+                  },
+                  "location.txt": {
+                    name: "location.txt",
+                    type: "file",
+                    content: job.location,
+                  },
+                  "startDate.txt": {
+                    name: "startDate.txt",
+                    type: "file",
+                    content: job.startDate,
+                  },
+                  "endDate.txt": {
+                    name: "endDate.txt",
+                    type: "file",
+                    content: job.endDate,
+                  },
+                  "responsibilities.txt": {
+                    name: "responsibilities.txt",
+                    type: "file",
+                    content: job.responsibilities.join("\n"),
+                  },
+                },
               },
             ])
           ),

@@ -1,23 +1,49 @@
 {
+  "personalInfo": {
+    "name": "Nick Neely",
+    "title": "Professional Software Consultant",
+    "contact": {
+      "email": "contact@nickneely.dev",
+      "website": "https://nickneely.dev",
+      "linkedin": "https://linkedin.com/in/nick-neely",
+      "github": "https://github.com/nick-neely"
+    },
+    "currentEmployer": "Lean TECHniques"
+  },
   "about": "Full-stack developer leveraging expertise in TypeScript, React, and front-end technologies to contribute innovative solutions and grow in a dynamic environment.",
   "experience": [
     {
-      "company": "Lean Techniques",
+      "company": "Lean TECHniques",
       "position": "Professional Software Consultant",
-      "duration": "August 2024 - Present",
-      "description": "Developing solutions using TypeScript, React, Vue, and .NET. Key projects include modernizing legacy systems and creating scalable web applications with cloud integration."
+      "location": "Johnston, Iowa, USA",
+      "startDate": "August 2024",
+      "endDate": "Present",
+      "responsibilities": [
+        "Developing solutions using TypeScript, React, Vue, and .NET.",
+        "Modernizing legacy systems and creating scalable web applications with cloud integration."
+      ]
     },
     {
-      "company": "Lean Techniques",
+      "company": "Lean TECHniques",
       "position": "Software Engineer Intern",
-      "duration": "June 2024 - August 2024",
-      "description": "Developed a TypeScript-based mock photo album API using AWS and implemented serverless architecture. Evaluated React form builder libraries and authored comprehensive analyses to assist client decision-making."
+      "location": "Johnston, Iowa, USA",
+      "startDate": "June 2024",
+      "endDate": "August 2024",
+      "responsibilities": [
+        "Developed a TypeScript-based mock photo album API using AWS and implemented serverless architecture.",
+        "Evaluated React form builder libraries and authored comprehensive analyses to assist client decision-making."
+      ]
     },
     {
       "company": "Moore Hearing Clinic",
       "position": "Digital Operations Specialist",
-      "duration": "September 2015 - May 2024",
-      "description": "Automated insurance calculations and payroll processes using Python, resulting in significant time savings and error reductions. Built a clinic management system with React and Node.js."
+      "location": "Ottumwa, Iowa, USA",
+      "startDate": "September 2015",
+      "endDate": "May 2024",
+      "responsibilities": [
+        "Automated insurance calculations and payroll processes using Python, resulting in significant time savings and error reductions.",
+        "Built a clinic management system with React and Node.js."
+      ]
     }
   ],
   "skills": {
