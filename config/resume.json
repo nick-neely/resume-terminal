@@ -8,23 +8,23 @@
       "linkedin": "https://linkedin.com/in/nick-neely",
       "github": "https://github.com/nick-neely"
     },
-    "currentEmployer": "Lean Techniques"
+    "currentEmployer": "Lean TECHniques"
   },
   "about": "Full-stack developer leveraging expertise in TypeScript, React, and front-end technologies to contribute innovative solutions and grow in a dynamic environment.",
   "experience": [
     {
-      "company": "Lean Techniques",
+      "company": "Lean TECHniques",
       "position": "Professional Software Consultant",
       "location": "Johnston, Iowa, USA",
       "startDate": "August 2024",
       "endDate": "Present",
       "responsibilities": [
-        "Developing solutions using TypeScript, React, and .NET.",
+        "Developing solutions using TypeScript, React, Vue, and .NET.",
         "Modernizing legacy systems and creating scalable web applications with cloud integration."
       ]
     },
     {
-      "company": "Lean Techniques",
+      "company": "Lean TECHniques",
       "position": "Software Engineer Intern",
       "location": "Johnston, Iowa, USA",
       "startDate": "June 2024",
