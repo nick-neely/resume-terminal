@@ -1,0 +1,34 @@
+{
+  "name": {
+    "full": "ResumeTerminal - Interactive Command-Line Resume Experience",
+    "short": "ResumeTerminal",
+    "legal": "ResumeTerminal"
+  },
+  "seo": {
+    "title": "ResumeTerminal - Explore a Developer's Resume Through the Terminal",
+    "description": "An open-source, terminal-inspired resume application that lets you navigate professional experience using real command-line commands like 'cd', 'ls', and 'help'. Engage with projects, skills, and more in a unique and interactive way.",
+    "category": "Interactive Resume, Developer Portfolio, Web Application",
+    "keywords": [
+      "Interactive Resume",
+      "Command-Line Resume",
+      "Terminal Resume",
+      "CLI Portfolio",
+      "Developer Resume",
+      "Software Engineer",
+      "Consultant",
+      "Open Source",
+      "Next.js",
+      "React",
+      "Tailwind CSS",
+      "shadcn/ui",
+      "Tech Portfolio"
+    ],
+    "url": "https://nickneely.dev/",
+    "author": {
+      "name": "Nick Neely",
+      "url": "https://nickneely.dev/"
+    },
+    "creator": "Nick Neely",
+    "publisher": "Nick Neely"
+  }
+}
