@@ -4,7 +4,9 @@ import { PageTransition } from "@/components/PageTransition";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { cn, getCompanyDuration } from "@/lib/utils";
 import { Resume } from "@/types/schema";
+import { isPrintMode } from "@/utils/printMode";
 import { motion } from "framer-motion";
 import {
   ArrowLeftIcon,
@@ -23,7 +25,6 @@ import { useEffect, useState } from "react";
 import { QuickMenu } from "./QuickMenu";
 import { ScrollProgress } from "./ScrollProgress";
 import { Button } from "./ui/button";
-import { getCompanyDuration } from "@/lib/utils";
 
 interface ResumeContentProps {
   resume: Resume;
@@ -32,6 +33,7 @@ interface ResumeContentProps {
 export function ResumeContent({ resume }: ResumeContentProps) {
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [now, setNow] = useState<Date | null>(null);
+  const [printMode, setPrintMode] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -44,6 +46,20 @@ export function ResumeContent({ resume }: ResumeContentProps) {
 
   useEffect(() => {
     setNow(new Date());
+  }, []);
+
+  useEffect(() => {
+    const handlePrintMode = () => setPrintMode(isPrintMode());
+    window.addEventListener("resize", handlePrintMode); // catch mode changes
+    const observer = new MutationObserver(handlePrintMode);
+    const el = document.querySelector("[data-resume-content]");
+    if (el)
+      observer.observe(el, { attributes: true, attributeFilter: ["class"] });
+    handlePrintMode();
+    return () => {
+      window.removeEventListener("resize", handlePrintMode);
+      observer.disconnect();
+    };
   }, []);
 
   const scrollToTop = () => {
@@ -111,38 +127,42 @@ export function ResumeContent({ resume }: ResumeContentProps) {
                     <MailIcon className="w-4 h-4" />
                     {resume.personalInfo.contact.email}
                   </a>
-                  {resume.personalInfo.contact.website && (
-                    <Link
-                      href={resume.personalInfo.contact.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-zinc-400 hover:text-zinc-200 transition-colors"
-                    >
-                      <LinkIcon className="w-4 h-4" />
-                      Website
-                    </Link>
-                  )}
-                  {resume.personalInfo.contact.linkedin && (
-                    <Link
-                      href={resume.personalInfo.contact.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-zinc-400 hover:text-zinc-200 transition-colors"
-                    >
-                      <LinkedinIcon className="w-4 h-4" />
-                      LinkedIn
-                    </Link>
-                  )}
-                  {resume.personalInfo.contact.github && (
-                    <Link
-                      href={resume.personalInfo.contact.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-zinc-400 hover:text-zinc-200 transition-colors"
-                    >
-                      <GithubIcon className="w-4 h-4" />
-                      GitHub
-                    </Link>
+                  {!printMode && (
+                    <>
+                      {resume.personalInfo.contact.website && (
+                        <Link
+                          href={resume.personalInfo.contact.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 text-zinc-400 hover:text-zinc-200 transition-colors"
+                        >
+                          <LinkIcon className="w-4 h-4" />
+                          Website
+                        </Link>
+                      )}
+                      {resume.personalInfo.contact.linkedin && (
+                        <Link
+                          href={resume.personalInfo.contact.linkedin}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 text-zinc-400 hover:text-zinc-200 transition-colors"
+                        >
+                          <LinkedinIcon className="w-4 h-4" />
+                          LinkedIn
+                        </Link>
+                      )}
+                      {resume.personalInfo.contact.github && (
+                        <Link
+                          href={resume.personalInfo.contact.github}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 text-zinc-400 hover:text-zinc-200 transition-colors"
+                        >
+                          <GithubIcon className="w-4 h-4" />
+                          GitHub
+                        </Link>
+                      )}
+                    </>
                   )}
                 </CardContent>
               </Card>
