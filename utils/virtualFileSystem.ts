@@ -258,4 +258,8 @@ export {
   listDirectory,
   readFile,
 };
-export type { VFS };
+
+export type {
+  VFS,
+  VFSNode,
+};

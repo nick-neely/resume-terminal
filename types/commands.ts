@@ -1,8 +1,10 @@
 import {
   VFS,
+  VFSNode,
   changeDirectory,
   listDirectory,
   readFile,
+  getCurrentDirectory,
 } from "@/utils/virtualFileSystem";
 
 export type CommandParameter = {
@@ -53,6 +55,48 @@ const commandHandlers = {
     return {
       output:
         "ResumeTerminal v1.0\nAn interactive command-line interface for exploring a personal resume.\nCreated with Next.js, React, and TypeScript.",
+      updatedVfs: vfs,
+    };
+  },
+
+  grep: async (args: string[], vfs: VFS) => {
+    if (args.length !== 1) {
+      return {
+        output: "Usage: grep <keyword>",
+        updatedVfs: vfs,
+      };
+    }
+
+    const keyword = args[0].toLowerCase();
+    const currentDir = getCurrentDirectory(vfs);
+    let matches = "";
+    let anyMatches = false;
+
+    // Helper function to recursively search files
+    const searchFiles = (node: VFSNode, path: string[] = []) => {
+      if (node.type === "file" && node.content) {
+        if (node.content.toLowerCase().includes(keyword)) {
+          anyMatches = true;
+          matches += `${path.join('/')}/${node.name}: ${node.content}\n`;
+        }
+      } else if (node.type === "directory" && node.children) {
+        Object.entries(node.children).forEach(([name, child]) => {
+          searchFiles(child, [...path, name]);
+        });
+      }
+    };
+
+    searchFiles(currentDir);
+
+    if (!anyMatches) {
+      return {
+        output: `No matches found for '${keyword}'`,
+        updatedVfs: vfs,
+      };
+    }
+
+    return {
+      output: matches.trim(),
       updatedVfs: vfs,
     };
   },
@@ -129,35 +173,35 @@ export const commands: CommandRegistry = {
   },
   cd: {
     name: "cd",
-    description: "Change the current directory",
-    usage: "cd [directory]",
+    description: "Change current directory",
+    usage: "cd <directory> | cd..",
     parameters: [
       {
         name: "directory",
         type: "string",
-        required: false,
-        description: 'Directory to change to. Use ".." to go up one level.',
+        required: true,
+        description: "The directory to change to",
       },
     ],
     action: commandHandlers.cd,
   },
   ls: {
     name: "ls",
-    description: "List contents of the current directory",
+    description: "List contents of current directory",
     usage: "ls",
     parameters: [],
     action: commandHandlers.ls,
   },
   cat: {
     name: "cat",
-    description: "Display the contents of a file",
-    usage: "cat <filename>",
+    description: "Display file contents",
+    usage: "cat <file>",
     parameters: [
       {
-        name: "filename",
+        name: "file",
         type: "string",
         required: true,
-        description: "Name of the file to display",
+        description: "The file to display",
       },
     ],
     action: commandHandlers.cat,
@@ -175,5 +219,19 @@ export const commands: CommandRegistry = {
     usage: "pwd",
     parameters: [],
     action: commandHandlers.pwd,
+  },
+  grep: {
+    name: "grep",
+    description: "Search for a specified pattern within files",
+    usage: "grep <keyword>",
+    parameters: [
+      {
+        name: "keyword",
+        type: "string",
+        required: true,
+        description: "The search term to look for in files",
+      },
+    ],
+    action: commandHandlers.grep,
   },
 };
