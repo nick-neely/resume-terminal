@@ -16,7 +16,7 @@ import {
   desktopWelcomeMessage,
   mobileWelcomeMessage,
 } from "@/utils/welcomeMessage";
-import { DownloadIcon, ExternalLinkIcon } from "lucide-react";
+import { DownloadIcon, ExternalLinkIcon, Send } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { StatusLine } from "./StatusLine";
@@ -204,36 +204,64 @@ export default function Terminal() {
               <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
               <div className="w-3 h-3 rounded-full bg-green-500"></div>
             </div>
-            <div className="flex items-center gap-2">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Link
-                      href="/resume"
-                      className="p-1.5 text-zinc-400 hover:text-zinc-200 transition-colors rounded-md hover:bg-zinc-700/50"
-                    >
-                      <ExternalLinkIcon className="w-4 h-4" />
-                    </Link>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>View Resume</p>
-                  </TooltipContent>
-                </Tooltip>
-
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      onClick={handleDownload}
-                      className="p-1.5 text-zinc-400 hover:text-zinc-200 transition-colors rounded-md hover:bg-zinc-700/50"
-                    >
-                      <DownloadIcon className="w-4 h-4" />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Download Resume</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+            <div
+              className={`flex items-center gap-2 ${
+                isMobile ? "mt-2 mb-2" : ""
+              }`}
+            >
+              {!isMobile ? (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Link
+                        href="/resume"
+                        tabIndex={0}
+                        className="p-1.5 text-zinc-400 hover:text-zinc-200 transition-colors rounded-md hover:bg-zinc-700/50"
+                        aria-label="View Resume"
+                      >
+                        <ExternalLinkIcon className="w-4 h-4" />
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>View Resume</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        onClick={handleDownload}
+                        tabIndex={0}
+                        className="p-1.5 text-zinc-400 hover:text-zinc-200 transition-colors rounded-md hover:bg-zinc-700/50"
+                        aria-label="Download Resume"
+                      >
+                        <DownloadIcon className="w-4 h-4" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Download Resume</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              ) : (
+                <>
+                  <Link
+                    href="/resume"
+                    tabIndex={0}
+                    className="p-3 text-zinc-400 hover:text-zinc-200 transition-colors rounded-lg hover:bg-zinc-700/50 min-w-[48px] min-h-[48px] flex items-center justify-center"
+                    aria-label="View Resume"
+                  >
+                    <ExternalLinkIcon className="w-7 h-7" />
+                  </Link>
+                  <button
+                    onClick={handleDownload}
+                    tabIndex={0}
+                    className="p-3 text-zinc-400 hover:text-zinc-200 transition-colors rounded-lg hover:bg-zinc-700/50 min-w-[48px] min-h-[48px] flex items-center justify-center"
+                    aria-label="Download Resume"
+                  >
+                    <DownloadIcon className="w-7 h-7" />
+                  </button>
+                </>
+              )}
             </div>
           </div>
           <div
@@ -256,13 +284,32 @@ export default function Terminal() {
             className="border-t border-zinc-700"
           >
             <div className="flex flex-col">
-              <div className="flex p-2 relative group">
-                <span className="text-zinc-500 mr-2 shrink-0 group-focus-within:text-zinc-300 transition-colors">
+              <div
+                className={`flex p-2 relative group ${
+                  isMobile ? "min-h-[56px]" : ""
+                }`}
+              >
+                <span
+                  className={
+                    `text-zinc-500 mr-2 shrink-0 group-focus-within:text-zinc-300 transition-colors ` +
+                    (isMobile ? "text-lg pt-2" : "")
+                  }
+                  style={isMobile ? { minWidth: 32 } : {}}
+                >
                   $
                 </span>
-                <div className="relative flex-grow">
+                <div
+                  className={`relative flex-grow ${
+                    isMobile ? "pt-1 pb-1" : ""
+                  }`}
+                >
                   {!hasUsedTab && (
-                    <span className="absolute right-2 top-0 text-xs text-zinc-600 pointer-events-none animate-pulse">
+                    <span
+                      className={
+                        `absolute right-2 top-0 text-xs text-zinc-600 pointer-events-none animate-pulse ` +
+                        (isMobile ? "top-2 right-3" : "")
+                      }
+                    >
                       Press Tab to autocomplete
                     </span>
                   )}
@@ -277,12 +324,39 @@ export default function Terminal() {
                     autoCapitalize="none"
                     autoComplete="off"
                     autoCorrect="off"
-                    className="absolute w-full h-6 bg-transparent border-none text-transparent focus:outline-none focus:ring-0 caret-transparent"
+                    className={
+                      isMobile
+                        ? "absolute w-full h-12 bg-transparent border-none text-transparent focus:outline-none focus:ring-0 caret-transparent touch-manipulation"
+                        : "absolute w-full h-6 bg-transparent border-none text-transparent focus:outline-none focus:ring-0 caret-transparent"
+                    }
+                    style={
+                      isMobile
+                        ? { minHeight: 48, fontSize: 18, paddingLeft: 2 }
+                        : {}
+                    }
+                    inputMode={isMobile ? "text" : undefined}
+                    aria-label="Command input"
                   />
-                  <span className="whitespace-pre-wrap break-all">
+                  <span
+                    className={
+                      `whitespace-pre-wrap break-all ` +
+                      (isMobile ? "text-lg min-h-[48px] pt-2" : "")
+                    }
+                    style={isMobile ? { minHeight: 48 } : {}}
+                  >
                     {input}
                     <span className="animate-blink">▋</span>
                   </span>
+                  {/* Mobile submit button */}
+                  {isMobile && (
+                    <button
+                      type="submit"
+                      aria-label="Send command"
+                      className="absolute right-0 top-1/2 -translate-y-1/2 bg-zinc-700 text-zinc-200 rounded-full p-2 flex items-center justify-center shadow-md active:bg-zinc-800 focus:outline-none w-10 h-10"
+                    >
+                      <Send className="w-6 h-6" />
+                    </button>
+                  )}
                 </div>
               </div>
               <StatusLine
