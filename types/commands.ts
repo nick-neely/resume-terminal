@@ -306,65 +306,6 @@ export const commands: CommandRegistry = {
         description: "The field to copy (email, website, linkedin, github)",
       },
     ],
-    action: async (args: string[], vfs: VFS) => {
-      if (args.length !== 1) {
-        return {
-          output:
-            "Usage: copy <field> (where field is email, website, linkedin, or github)",
-          updatedVfs: vfs,
-        };
-      }
-
-      const field = args[0].toLowerCase();
-      const contact =
-        vfs.root.children?.personalInfo?.children?.contact?.children;
-
-      if (!contact) {
-        return {
-          output: "Contact information not found",
-          updatedVfs: vfs,
-        };
-      }
-
-      const fieldMap: { [key: string]: string } = {
-        email: "email.txt",
-        website: "website.txt",
-        linkedin: "linkedin.txt",
-        github: "github.txt",
-      };
-
-      const fieldName = fieldMap[field];
-      if (!fieldName) {
-        return {
-          output: `Invalid field. Available fields: ${Object.keys(
-            fieldMap
-          ).join(", ")}`,
-          updatedVfs: vfs,
-        };
-      }
-
-      const file = contact[fieldName];
-      if (!file || file.type !== "file" || !file.content) {
-        return {
-          output: `Field not found: ${field}`,
-          updatedVfs: vfs,
-        };
-      }
-
-      try {
-        await navigator.clipboard.writeText(file.content);
-        return {
-          output: `Copied ${field} to clipboard`,
-          updatedVfs: vfs,
-        };
-      } catch (error) {
-        return {
-          output: `Failed to copy to clipboard: ${
-            error instanceof Error ? error.message : "Unknown error"
-          }`,
-          updatedVfs: vfs,
-        };
-      }
-    },
+    action: commandHandlers.copy,
   },
 };
