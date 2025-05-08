@@ -2,9 +2,9 @@ import {
   VFS,
   VFSNode,
   changeDirectory,
+  getCurrentDirectory,
   listDirectory,
   readFile,
-  getCurrentDirectory,
 } from "@/utils/virtualFileSystem";
 
 export type CommandParameter = {
@@ -32,6 +32,45 @@ export interface CommandRegistry {
 }
 
 const commandHandlers = {
+  tree: async (args: string[], vfs: VFS) => {
+    if (args.length > 0) {
+      return {
+        output: "Usage: tree",
+        updatedVfs: vfs,
+      };
+    }
+
+    const currentDir = getCurrentDirectory(vfs);
+    let output = "/\n";
+    const entries = Object.entries(currentDir.children ?? {});
+
+    const buildTree = (node: VFSNode, prefix: string, isLast: boolean) => {
+      const pointer = isLast ? "└── " : "├── ";
+      output +=
+        prefix +
+        pointer +
+        node.name +
+        (node.type === "directory" ? "/" : "") +
+        "\n";
+      if (node.type === "directory" && node.children) {
+        const childEntries = Object.entries(node.children);
+        childEntries.forEach(([_, child], idx) => {
+          const lastChild = idx === childEntries.length - 1;
+          buildTree(child, prefix + (isLast ? "    " : "│   "), lastChild);
+        });
+      }
+    };
+
+    entries.forEach(([_, node], idx) => {
+      const isLast = idx === entries.length - 1;
+      buildTree(node, "", isLast);
+    });
+
+    return {
+      output: output.trimEnd(),
+      updatedVfs: vfs,
+    };
+  },
   copy: async (args: string[], vfs: VFS) => {
     if (args.length !== 1) {
       return {
@@ -293,6 +332,13 @@ export const commands: CommandRegistry = {
       },
     ],
     action: commandHandlers.grep,
+  },
+  tree: {
+    name: "tree",
+    description: "Display the directory structure in a tree format",
+    usage: "tree",
+    parameters: [],
+    action: commandHandlers.tree,
   },
   copy: {
     name: "copy",
