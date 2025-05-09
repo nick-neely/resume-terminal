@@ -13,11 +13,19 @@ import { downloadFile } from "@/utils/downloadFile";
 import { isValidCommand } from "@/utils/statusUtils";
 import { getCurrentDirectory, initialVFS } from "@/utils/virtualFileSystem";
 import {
+  filterAutocompleteMatches,
+  shouldResetAutocomplete,
+  getNextAutocompleteIndex,
+  updateInputWithMatch
+} from "@/utils/terminalUtils";
+import {
   desktopWelcomeMessage,
   mobileWelcomeMessage,
 } from "@/utils/welcomeMessage";
 import { DownloadIcon, ExternalLinkIcon, Send } from "lucide-react";
 import { TerminalOutput } from "./TerminalOutput";
+import TerminalInput from "./TerminalInput";
+import TerminalHistory from "./TerminalHistory";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { StatusLine } from "./StatusLine";
@@ -89,68 +97,45 @@ export default function Terminal() {
       e.preventDefault();
       const inputParts = input.split(" ");
       const isTrailingSpace = input.endsWith(" ");
+      if (isTrailingSpace) inputParts.push("");
 
-      if (isTrailingSpace) {
-        inputParts.push("");
-      }
-
-      // Use the original prefix for cycling
       const cyclingPrefix = autocompletePrefix ?? inputParts[inputParts.length - 1];
-
-      // Helper to update input with a match
-      const updateInputWithMatch = (match: string) => {
-        inputParts[inputParts.length - 1] = match;
-        setInput(inputParts.join(" "));
-        setHasUsedTab(true);
-      };
 
       // Command autocomplete
       if (inputParts.length === 1 && cyclingPrefix !== "") {
-        const matches = Object.keys(commands).filter((cmd) =>
-          cmd.toLowerCase().startsWith(cyclingPrefix.toLowerCase())
-        );
+        const matches = filterAutocompleteMatches(Object.keys(commands), cyclingPrefix);
         if (matches.length > 0) {
-          if (
-            autocompleteOptions.length !== matches.length ||
-            !autocompleteOptions.every((v, i) => v === matches[i]) ||
-            autocompletePrefix !== cyclingPrefix
-          ) {
-            // New set of matches or new prefix, reset index and store prefix
+          if (shouldResetAutocomplete(autocompleteOptions, matches, cyclingPrefix, autocompletePrefix)) {
             setAutocompleteOptions(matches);
             setAutocompleteIndex(0);
             setAutocompletePrefix(cyclingPrefix);
-            updateInputWithMatch(matches[0]);
+            setInput(updateInputWithMatch(inputParts, matches[0]));
+            setHasUsedTab(true);
           } else {
-            // Cycle
-            const nextIndex = autocompleteIndex === null ? 0 : (autocompleteIndex + 1) % matches.length;
+            const nextIndex = getNextAutocompleteIndex(autocompleteIndex, matches.length);
             setAutocompleteIndex(nextIndex);
-            updateInputWithMatch(matches[nextIndex]);
+            setInput(updateInputWithMatch(inputParts, matches[nextIndex ?? 0]));
+            setHasUsedTab(true);
           }
         }
       } else {
         // Directory/file autocomplete
         try {
           const currentDir = getCurrentDirectory(vfs);
-          const options = currentDir.children
-            ? Object.keys(currentDir.children)
-            : [];
-          const matches = options.filter((name) =>
-            name.toLowerCase().startsWith(cyclingPrefix.toLowerCase())
-          );
+          const options = currentDir.children ? Object.keys(currentDir.children) : [];
+          const matches = filterAutocompleteMatches(options, cyclingPrefix);
           if (matches.length > 0) {
-            if (
-              autocompleteOptions.length !== matches.length ||
-              !autocompleteOptions.every((v, i) => v === matches[i]) ||
-              autocompletePrefix !== cyclingPrefix
-            ) {
+            if (shouldResetAutocomplete(autocompleteOptions, matches, cyclingPrefix, autocompletePrefix)) {
               setAutocompleteOptions(matches);
               setAutocompleteIndex(0);
               setAutocompletePrefix(cyclingPrefix);
-              updateInputWithMatch(matches[0]);
+              setInput(updateInputWithMatch(inputParts, matches[0]));
+              setHasUsedTab(true);
             } else {
-              const nextIndex = autocompleteIndex === null ? 0 : (autocompleteIndex + 1) % matches.length;
+              const nextIndex = getNextAutocompleteIndex(autocompleteIndex, matches.length);
               setAutocompleteIndex(nextIndex);
-              updateInputWithMatch(matches[nextIndex]);
+              setInput(updateInputWithMatch(inputParts, matches[nextIndex ?? 0]));
+              setHasUsedTab(true);
             }
           }
         } catch (error) {
@@ -305,13 +290,8 @@ export default function Terminal() {
               )}
             </div>
           </div>
-          <div
-            ref={outputRef}
-            className="h-[60vh] p-4 overflow-auto whitespace-pre-wrap"
-          >
-            {output.map((line, index) => (
-              <TerminalOutput key={index} output={line} index={index} />
-            ))}
+          <div className="flex flex-col h-[60vh] p-4 overflow-auto whitespace-pre-wrap" ref={outputRef}>
+            <TerminalHistory output={output} />
           </div>
           <form
             onSubmit={handleInputSubmit}
@@ -347,50 +327,15 @@ export default function Terminal() {
                       Press Tab to autocomplete
                     </span>
                   )}
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={input}
-                    onChange={handleInputChange}
-                    onKeyDown={handleKeyDown}
-                    onPaste={handlePaste}
-                    spellCheck={false}
-                    autoCapitalize="none"
-                    autoComplete="off"
-                    autoCorrect="off"
-                    className={
-                      isMobile
-                        ? "absolute w-full h-12 bg-transparent border-none text-transparent focus:outline-none focus:ring-0 caret-transparent touch-manipulation"
-                        : "absolute w-full h-6 bg-transparent border-none text-transparent focus:outline-none focus:ring-0 caret-transparent"
-                    }
-                    style={
-                      isMobile
-                        ? { minHeight: 48, fontSize: 18, paddingLeft: 2 }
-                        : {}
-                    }
-                    inputMode={isMobile ? "text" : undefined}
-                    aria-label="Command input"
+                  <TerminalInput
+                    input={input}
+                    setInput={setInput}
+                    handleKeyDown={handleKeyDown}
+                    handleInputChange={handleInputChange}
+                    handlePaste={handlePaste}
+                    inputRef={inputRef}
+                    isMobile={isMobile}
                   />
-                  <span
-                    className={
-                      `whitespace-pre-wrap break-all ` +
-                      (isMobile ? "text-lg min-h-[48px] pt-2" : "")
-                    }
-                    style={isMobile ? { minHeight: 48 } : {}}
-                  >
-                    {input}
-                    <span className="animate-blink">▋</span>
-                  </span>
-                  {/* Mobile submit button */}
-                  {isMobile && (
-                    <button
-                      type="submit"
-                      aria-label="Send command"
-                      className="absolute right-0 top-1/2 -translate-y-1/2 bg-zinc-700 text-zinc-200 rounded-full p-2 flex items-center justify-center shadow-md active:bg-zinc-800 focus:outline-none w-10 h-10"
-                    >
-                      <Send className="w-6 h-6" />
-                    </button>
-                  )}
                 </div>
               </div>
               <StatusLine
