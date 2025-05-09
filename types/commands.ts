@@ -42,16 +42,10 @@ const commandHandlers = {
 
     const currentDir = getCurrentDirectory(vfs);
     let output = "/\n";
-    const entries = Object.entries(currentDir.children ?? {});
 
     const buildTree = (node: VFSNode, prefix: string, isLast: boolean) => {
       const pointer = isLast ? "└── " : "├── ";
-      output +=
-        prefix +
-        pointer +
-        node.name +
-        (node.type === "directory" ? "/" : "") +
-        "\n";
+      output += prefix + pointer + node.name + (node.type === "directory" ? "/" : "") + "\n";
       if (node.type === "directory" && node.children) {
         const childEntries = Object.entries(node.children);
         childEntries.forEach(([_, child], idx) => {
@@ -61,13 +55,17 @@ const commandHandlers = {
       }
     };
 
+    const entries = Object.entries(currentDir.children ?? {});
     entries.forEach(([_, node], idx) => {
       const isLast = idx === entries.length - 1;
       buildTree(node, "", isLast);
     });
 
     return {
-      output: output.trimEnd(),
+      output: JSON.stringify({
+        type: "text-output",
+        content: output.trimEnd(),
+      }),
       updatedVfs: vfs,
     };
   },
@@ -168,15 +166,25 @@ const commandHandlers = {
 
     const keyword = args[0].toLowerCase();
     const currentDir = getCurrentDirectory(vfs);
-    let matches = "";
+    let matches: { path: string; content: string; line: string }[] = [];
     let anyMatches = false;
 
     // Helper function to recursively search files
     const searchFiles = (node: VFSNode, path: string[] = []) => {
       if (node.type === "file" && node.content) {
-        if (node.content.toLowerCase().includes(keyword)) {
-          anyMatches = true;
-          matches += `${path.join("/")}/${node.name}: ${node.content}\n`;
+        const content = node.content.toLowerCase();
+        if (content.includes(keyword)) {
+          const lines = node.content.split("\n");
+          lines.forEach((line, index) => {
+            if (line.toLowerCase().includes(keyword)) {
+              matches.push({
+                path: `${path.join("/")}/${node.name}`,
+                content: line,
+                line: `Line ${index + 1}`,
+              });
+              anyMatches = true;
+            }
+          });
         }
       } else if (node.type === "directory" && node.children) {
         Object.entries(node.children).forEach(([name, child]) => {
@@ -194,8 +202,19 @@ const commandHandlers = {
       };
     }
 
+    // Format the output as a special JSON string that our Terminal component will recognize
+    const grepData = {
+      type: "grep-output",
+      matches: matches.map(({ path, content, line }) => ({
+        path,
+        content,
+        line,
+        keyword,
+      })),
+    };
+
     return {
-      output: matches.trim(),
+      output: JSON.stringify(grepData),
       updatedVfs: vfs,
     };
   },
@@ -216,9 +235,16 @@ const commandHandlers = {
 
   ls: async (_args: string[], vfs: VFS) => {
     try {
-      const contents = listDirectory(vfs);
+      const currentDir = getCurrentDirectory(vfs);
+      const items = Object.entries(currentDir.children ?? {}).map(([name, node]) => ({
+        name,
+        type: node.type
+      }));
       return {
-        output: contents.length > 0 ? contents.join("\n") : "Empty directory",
+        output: JSON.stringify({
+          type: 'grid-output',
+          items
+        }),
         updatedVfs: vfs,
       };
     } catch (error) {
@@ -233,7 +259,25 @@ const commandHandlers = {
 
     try {
       const content = readFile(vfs, args[0]);
-      return { output: content, updatedVfs: vfs };
+      if (content.includes('\n')) {
+        // Multi-line: show as bulleted list
+        return {
+          output: JSON.stringify({
+            type: 'list-output',
+            items: content.split('\n').filter(line => line.trim() !== '')
+          }),
+          updatedVfs: vfs
+        };
+      } else {
+        // Single line: show as plain text
+        return {
+          output: JSON.stringify({
+            type: 'text-output',
+            content: content
+          }),
+          updatedVfs: vfs
+        };
+      }
     } catch (error) {
       return { output: (error as Error).message, updatedVfs: vfs };
     }

@@ -17,6 +17,7 @@ import {
   mobileWelcomeMessage,
 } from "@/utils/welcomeMessage";
 import { DownloadIcon, ExternalLinkIcon, Send } from "lucide-react";
+import { TerminalOutput } from "./TerminalOutput";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { StatusLine } from "./StatusLine";
@@ -269,14 +270,7 @@ export default function Terminal() {
             className="h-[60vh] p-4 overflow-auto whitespace-pre-wrap"
           >
             {output.map((line, index) => (
-              <div
-                key={index}
-                className={`mb-2 ${
-                  line.startsWith("$") ? "text-zinc-500" : ""
-                } ${index === 0 ? "animate-slide-in" : ""}`}
-              >
-                {line}
-              </div>
+              <TerminalOutput key={index} output={line} index={index} />
             ))}
           </div>
           <form
