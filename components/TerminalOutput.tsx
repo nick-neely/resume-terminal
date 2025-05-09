@@ -26,17 +26,23 @@ export const TerminalOutput: React.FC<TerminalOutputProps> = ({ output, index })
       case 'grid-output':
         return (
           <div className="mb-2 grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-2">
-            {data.items.map((item, i) => (
-              <div 
-                key={i}
-                className={cn(
-                  'truncate',
-                  item.type === 'directory' ? 'text-blue-400' : 'text-zinc-200'
-                )}
-              >
-                {item.name}{item.type === 'directory' ? '/' : ''}
-              </div>
-            ))}
+            {data.items.map((item, i) => {
+              const displayName = item.name + (item.type === 'directory' ? '/' : '');
+              const shouldTruncate = displayName.length > 30;
+              return (
+                <div
+                  key={i}
+                  className={cn(
+                    shouldTruncate ? 'truncate' : '',
+                    item.type === 'directory' ? 'text-blue-400' : 'text-zinc-200',
+                    'whitespace-nowrap'
+                  )}
+                  title={shouldTruncate ? displayName : undefined}
+                >
+                  {displayName}
+                </div>
+              );
+            })}
           </div>
         );
 
