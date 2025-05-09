@@ -32,6 +32,9 @@ export default function Terminal() {
   const [, setHistoryIndex] = useState<number | null>(null);
   const [vfs, setVfs] = useState(initialVFS);
   const [hasUsedTab, setHasUsedTab] = useState(false);
+  const [autocompleteOptions, setAutocompleteOptions] = useState<string[]>([]);
+  const [autocompleteIndex, setAutocompleteIndex] = useState<number | null>(null);
+  const [autocompletePrefix, setAutocompletePrefix] = useState<string | null>(null);
 
   useEffect(() => {
     const checkWidth = () => {
@@ -51,6 +54,9 @@ export default function Terminal() {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value.replace(/[\u0000-\u001F]/g, "");
       setInput(value);
+      setAutocompleteOptions([]);
+      setAutocompleteIndex(null);
+      setAutocompletePrefix(null);
     },
     []
   );
@@ -88,30 +94,64 @@ export default function Terminal() {
         inputParts.push("");
       }
 
-      const lastPart = inputParts[inputParts.length - 1];
+      // Use the original prefix for cycling
+      const cyclingPrefix = autocompletePrefix ?? inputParts[inputParts.length - 1];
 
-      if (inputParts.length === 1 && lastPart !== "") {
-        const matchingCommands = Object.keys(commands).filter((cmd) =>
-          cmd.startsWith(lastPart)
+      // Helper to update input with a match
+      const updateInputWithMatch = (match: string) => {
+        inputParts[inputParts.length - 1] = match;
+        setInput(inputParts.join(" "));
+        setHasUsedTab(true);
+      };
+
+      // Command autocomplete
+      if (inputParts.length === 1 && cyclingPrefix !== "") {
+        const matches = Object.keys(commands).filter((cmd) =>
+          cmd.toLowerCase().startsWith(cyclingPrefix.toLowerCase())
         );
-        if (matchingCommands.length === 1) {
-          inputParts[0] = matchingCommands[0];
-          setInput(inputParts.join(" "));
-          setHasUsedTab(true);
+        if (matches.length > 0) {
+          if (
+            autocompleteOptions.length !== matches.length ||
+            !autocompleteOptions.every((v, i) => v === matches[i]) ||
+            autocompletePrefix !== cyclingPrefix
+          ) {
+            // New set of matches or new prefix, reset index and store prefix
+            setAutocompleteOptions(matches);
+            setAutocompleteIndex(0);
+            setAutocompletePrefix(cyclingPrefix);
+            updateInputWithMatch(matches[0]);
+          } else {
+            // Cycle
+            const nextIndex = autocompleteIndex === null ? 0 : (autocompleteIndex + 1) % matches.length;
+            setAutocompleteIndex(nextIndex);
+            updateInputWithMatch(matches[nextIndex]);
+          }
         }
       } else {
+        // Directory/file autocomplete
         try {
           const currentDir = getCurrentDirectory(vfs);
           const options = currentDir.children
             ? Object.keys(currentDir.children)
             : [];
-          const matchingOptions = options.filter((name) =>
-            name.startsWith(lastPart)
+          const matches = options.filter((name) =>
+            name.toLowerCase().startsWith(cyclingPrefix.toLowerCase())
           );
-          if (matchingOptions.length === 1) {
-            inputParts[inputParts.length - 1] = matchingOptions[0];
-            setInput(inputParts.join(" "));
-            setHasUsedTab(true);
+          if (matches.length > 0) {
+            if (
+              autocompleteOptions.length !== matches.length ||
+              !autocompleteOptions.every((v, i) => v === matches[i]) ||
+              autocompletePrefix !== cyclingPrefix
+            ) {
+              setAutocompleteOptions(matches);
+              setAutocompleteIndex(0);
+              setAutocompletePrefix(cyclingPrefix);
+              updateInputWithMatch(matches[0]);
+            } else {
+              const nextIndex = autocompleteIndex === null ? 0 : (autocompleteIndex + 1) % matches.length;
+              setAutocompleteIndex(nextIndex);
+              updateInputWithMatch(matches[nextIndex]);
+            }
           }
         } catch (error) {
           console.error("Error while autocompleting path:", error);
