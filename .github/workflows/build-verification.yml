@@ -1,4 +1,4 @@
-name: Check Prettier Formatting
+name: Build Verification
 
 on:
   push:
@@ -6,24 +6,23 @@ on:
       - main
       - master
     paths:
-      - '**/*.js'
       - '**/*.ts'
       - '**/*.tsx'
+      - '**/*.js'
       - '**/*.jsx'
-      - '**/*.json'
-      - '**/*.css'
-      - '**/*.md'
-      - '**/*.yml'
-      - '**/*.yaml'
-      - '**/*.scss'
-      - '**/*.html'
-      - '.prettierrc'
       - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'next.config.*'
+      - 'tsconfig.json'
+      - 'public/**'
+      - 'app/**'
+      - 'components/**'
+      - 'lib/**'
+      - 'utils/**'
 
 jobs:
-  prettier-check:
+  build:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.draft == false
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node.js
@@ -34,5 +33,5 @@ jobs:
         run: npm install -g pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Check formatting
-        run: pnpm prettier --check .
+      - name: Build project
+        run: pnpm build

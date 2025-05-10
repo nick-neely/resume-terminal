@@ -1,4 +1,4 @@
-name: Check Prettier Formatting
+name: TypeScript Type Check
 
 on:
   push:
@@ -6,24 +6,15 @@ on:
       - main
       - master
     paths:
-      - '**/*.js'
       - '**/*.ts'
       - '**/*.tsx'
-      - '**/*.jsx'
-      - '**/*.json'
-      - '**/*.css'
-      - '**/*.md'
-      - '**/*.yml'
-      - '**/*.yaml'
-      - '**/*.scss'
-      - '**/*.html'
-      - '.prettierrc'
+      - 'tsconfig.json'
       - 'package.json'
+      - 'pnpm-lock.yaml'
 
 jobs:
-  prettier-check:
+  type-check:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.draft == false
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node.js
@@ -34,5 +25,5 @@ jobs:
         run: npm install -g pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Check formatting
-        run: pnpm prettier --check .
+      - name: TypeScript type check
+        run: pnpm tsc --noEmit
