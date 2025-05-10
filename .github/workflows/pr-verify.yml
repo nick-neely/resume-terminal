@@ -7,8 +7,6 @@ jobs:
   install:
     name: Install dependencies
     runs-on: ubuntu-latest
-    outputs:
-      pnpm_cache: ${{ steps.cache-pnpm.outputs.cache-hit }}
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node.js
@@ -17,12 +15,23 @@ jobs:
           node-version: '20'
       - name: Install pnpm
         run: npm install -g pnpm
+      - name: Get pnpm store directory
+        id: pnpm-store
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
       - name: Cache pnpm store
-        id: cache-pnpm
         uses: actions/cache@v4
         with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: cache-deps
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -38,11 +47,24 @@ jobs:
           node-version: '20'
       - name: Install pnpm
         run: npm install -g pnpm
+      - name: Get pnpm store directory
+        id: pnpm-store
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
       - name: Restore pnpm store
         uses: actions/cache@v4
         with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      - name: Restore node_modules
+        uses: actions/cache@v4
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
+      - name: Install dependencies
+        run: pnpm install --prefer-offline --frozen-lockfile
       - name: Build project
         run: pnpm build
 
@@ -58,11 +80,24 @@ jobs:
           node-version: '20'
       - name: Install pnpm
         run: npm install -g pnpm
+      - name: Get pnpm store directory
+        id: pnpm-store
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
       - name: Restore pnpm store
         uses: actions/cache@v4
         with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      - name: Restore node_modules
+        uses: actions/cache@v4
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
+      - name: Install dependencies
+        run: pnpm install --prefer-offline --frozen-lockfile
       - name: Run ESLint
         run: pnpm lint
 
@@ -78,11 +113,24 @@ jobs:
           node-version: '20'
       - name: Install pnpm
         run: npm install -g pnpm
+      - name: Get pnpm store directory
+        id: pnpm-store
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
       - name: Restore pnpm store
         uses: actions/cache@v4
         with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      - name: Restore node_modules
+        uses: actions/cache@v4
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
+      - name: Install dependencies
+        run: pnpm install --prefer-offline --frozen-lockfile
       - name: TypeScript type check
         run: pnpm tsc --noEmit
 
@@ -96,6 +144,28 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+      - name: Install pnpm
+        run: npm install -g pnpm
+      - name: Get pnpm store directory
+        id: pnpm-store
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+      - name: Restore pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      - name: Restore node_modules
+        uses: actions/cache@v4
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
+      - name: Install dependencies
+        run: pnpm install --prefer-offline --frozen-lockfile
+      - name: Check formatting
+        run: pnpm prettier --check .
       - name: Install pnpm
         run: npm install -g pnpm
       - name: Restore pnpm store
