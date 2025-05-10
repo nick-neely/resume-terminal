@@ -55,7 +55,7 @@ export const TerminalOutput: React.FC<TerminalOutputProps> = ({
           <ul className="mb-2 flex flex-col gap-2">
             {data.items.map((item: string, i: number) => (
               <li key={i} className="flex items-start gap-2">
-                <span className="mt-2 w-2 h-2 rounded-full bg-blue-400 inline-block"></span>
+                <span className="w-2 h-2 rounded-full bg-blue-400 mt-2 inline-block flex-shrink-0"></span>
                 <span className="text-zinc-200 whitespace-pre-line">
                   {item}
                 </span>
