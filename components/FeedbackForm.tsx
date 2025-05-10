@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   Form,
   FormControl,
@@ -16,20 +16,20 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { MessageSquareIcon } from "lucide-react";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import * as z from "zod";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { MessageSquareIcon } from 'lucide-react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import * as z from 'zod';
 
 const formSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  subject: z.string().min(1, "Subject is required"),
-  message: z.string().min(10, "Message must be at least 10 characters"),
+  email: z.string().email('Please enter a valid email address'),
+  subject: z.string().min(1, 'Subject is required'),
+  message: z.string().min(10, 'Message must be at least 10 characters'),
 });
 
 export function FeedbackForm() {
@@ -38,9 +38,9 @@ export function FeedbackForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
-      subject: "",
-      message: "",
+      email: '',
+      subject: '',
+      message: '',
     },
   });
 
@@ -48,12 +48,12 @@ export function FeedbackForm() {
     try {
       // Implement your form submission logic here
       console.log(values);
-      toast.success("Feedback submitted successfully!");
+      toast.success('Feedback submitted successfully!');
       setOpen(false);
       form.reset();
     } catch (error) {
-      console.error("Error submitting feedback:", error);
-      toast.error("Failed to submit feedback. Please try again.");
+      console.error('Error submitting feedback:', error);
+      toast.error('Failed to submit feedback. Please try again.');
     }
   };
 
@@ -67,9 +67,7 @@ export function FeedbackForm() {
       </DialogTrigger>
       <DialogContent className="bg-zinc-900 border-zinc-700">
         <DialogHeader>
-          <DialogTitle className="text-zinc-100 text-xl">
-            Send Feedback
-          </DialogTitle>
+          <DialogTitle className="text-zinc-100 text-xl">Send Feedback</DialogTitle>
           <DialogDescription className="text-zinc-400 text-base">
             Share your thoughts or get in touch directly.
           </DialogDescription>
@@ -81,9 +79,7 @@ export function FeedbackForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-zinc-200 text-base">
-                    Email
-                  </FormLabel>
+                  <FormLabel className="text-zinc-200 text-base">Email</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="your@email.com"
@@ -101,9 +97,7 @@ export function FeedbackForm() {
               name="subject"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-zinc-200 text-base">
-                    Subject
-                  </FormLabel>
+                  <FormLabel className="text-zinc-200 text-base">Subject</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Feedback subject"
@@ -121,9 +115,7 @@ export function FeedbackForm() {
               name="message"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-zinc-200 text-base">
-                    Message
-                  </FormLabel>
+                  <FormLabel className="text-zinc-200 text-base">Message</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Your message..."

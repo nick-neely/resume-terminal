@@ -1,5 +1,5 @@
-import { ResumeContent } from "@/components/ResumeContent";
-import { getResumeData } from "@/utils/resumeParser";
+import { ResumeContent } from '@/components/ResumeContent';
+import { getResumeData } from '@/utils/resumeParser';
 
 export default function ResumePage() {
   const resume = getResumeData();

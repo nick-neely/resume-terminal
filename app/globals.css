@@ -41,7 +41,9 @@
 @layer base {
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
   }
 }
 
@@ -57,8 +59,34 @@
 }
 
 @layer utilities {
-  .animate-blink {
-    animation: blink 1s step-end infinite;
+  /* Terminal block cursor blink: only background blinks, not text */
+  .blink-bg {
+    --cursor-bg: #e5e7eb;
+    --cursor-fg: #000;
+    background: var(--cursor-bg);
+    color: var(--cursor-fg);
+    animation: blink-cursor 1s step-end infinite;
+    transition:
+      background 0.05s,
+      color 0.05s;
+    display: inline-block;
+    height: 1.1em; /* Make cursor height closer to text size */
+    line-height: 1.1em;
+    vertical-align: baseline;
+    padding-top: 0;
+    margin-top: 0;
+  }
+  @keyframes blink-cursor {
+    0%,
+    50% {
+      --cursor-bg: #e5e7eb;
+      --cursor-fg: #000;
+    }
+    50.01%,
+    100% {
+      --cursor-bg: transparent;
+      --cursor-fg: #e5e7eb; /* zinc-200 */
+    }
   }
 
   @keyframes slide-in {
