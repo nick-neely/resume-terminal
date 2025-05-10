@@ -4,9 +4,11 @@ on:
   pull_request:
 
 jobs:
-  build:
-    name: Build
+  install:
+    name: Install dependencies
     runs-on: ubuntu-latest
+    outputs:
+      pnpm_cache: ${{ steps.cache-pnpm.outputs.cache-hit }}
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node.js
@@ -15,14 +17,39 @@ jobs:
           node-version: '20'
       - name: Install pnpm
         run: npm install -g pnpm
+      - name: Cache pnpm store
+        id: cache-pnpm
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install pnpm
+        run: npm install -g pnpm
+      - name: Restore pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
       - name: Build project
         run: pnpm build
 
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    needs: install
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node.js
@@ -31,14 +58,18 @@ jobs:
           node-version: '20'
       - name: Install pnpm
         run: npm install -g pnpm
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Restore pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
       - name: Run ESLint
         run: pnpm lint
 
   type-check:
     name: TypeScript Type Check
     runs-on: ubuntu-latest
+    needs: install
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node.js
@@ -47,14 +78,18 @@ jobs:
           node-version: '20'
       - name: Install pnpm
         run: npm install -g pnpm
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Restore pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
       - name: TypeScript type check
         run: pnpm tsc --noEmit
 
   format:
     name: Prettier Format Check
     runs-on: ubuntu-latest
+    needs: install
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node.js
@@ -63,7 +98,10 @@ jobs:
           node-version: '20'
       - name: Install pnpm
         run: npm install -g pnpm
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Restore pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
       - name: Check formatting
         run: pnpm prettier --check .
