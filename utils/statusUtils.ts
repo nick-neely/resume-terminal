@@ -7,11 +7,19 @@ export function getFormattedTime(): string {
   }).format(new Date());
 }
 
+// Add status formatting helpers here as needed
+export function formatWpm(wpm: number): string {
+  return wpm > 0 ? `${wpm} wpm` : "";
+}
+
 export function getFormattedDirectory(path: string[]): string {
   return path.length === 0 ? "/" : "/" + path.join("/");
 }
 
-export function isValidCommand(input: string, availableCommands: Record<string, any>): boolean {
-  const command = input.trim().split(' ')[0];
+export function isValidCommand(
+  input: string,
+  availableCommands: Record<string, any>
+): boolean {
+  const command = input.trim().split(" ")[0];
   return command in availableCommands;
 }

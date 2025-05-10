@@ -11,27 +11,29 @@ import { commands } from "@/types/commands";
 import { executeCommand, parseCommand } from "@/utils/commandParser";
 import { downloadFile } from "@/utils/downloadFile";
 import { isValidCommand } from "@/utils/statusUtils";
-import { getCurrentDirectory, initialVFS } from "@/utils/virtualFileSystem";
 import {
   filterAutocompleteMatches,
-  shouldResetAutocomplete,
   getNextAutocompleteIndex,
-  updateInputWithMatch
+  shouldResetAutocomplete,
+  updateInputWithMatch,
 } from "@/utils/terminalUtils";
+import { getCurrentDirectory, initialVFS } from "@/utils/virtualFileSystem";
 import {
   desktopWelcomeMessage,
   mobileWelcomeMessage,
 } from "@/utils/welcomeMessage";
 import { DownloadIcon, ExternalLinkIcon } from "lucide-react";
-import TerminalInput from "./TerminalInput";
-import TerminalHistory from "./TerminalHistory";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useLiveWPM } from "../utils/wpmUtils";
 import { StatusLine } from "./StatusLine";
+import TerminalHistory from "./TerminalHistory";
+import TerminalInput from "./TerminalInput";
 
 export default function Terminal() {
   const [isMobile, setIsMobile] = useState(false);
   const [input, setInput] = useState("");
+  const [wpm, onWpmInput] = useLiveWPM();
   const [output, setOutput] = useState<string[]>([]);
   const outputRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -40,8 +42,12 @@ export default function Terminal() {
   const [vfs, setVfs] = useState(initialVFS);
   const [hasUsedTab, setHasUsedTab] = useState(false);
   const [autocompleteOptions, setAutocompleteOptions] = useState<string[]>([]);
-  const [autocompleteIndex, setAutocompleteIndex] = useState<number | null>(null);
-  const [autocompletePrefix, setAutocompletePrefix] = useState<string | null>(null);
+  const [autocompleteIndex, setAutocompleteIndex] = useState<number | null>(
+    null
+  );
+  const [autocompletePrefix, setAutocompletePrefix] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
     const checkWidth = () => {
@@ -61,11 +67,13 @@ export default function Terminal() {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value.replace(/[\u0000-\u001F]/g, "");
       setInput(value);
+      onWpmInput(value);
+      setHasUsedTab(false);
       setAutocompleteOptions([]);
-      setAutocompleteIndex(null);
       setAutocompletePrefix(null);
+      setAutocompleteIndex(0);
     },
-    []
+    [onWpmInput]
   );
 
   const handleInputSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -98,20 +106,34 @@ export default function Terminal() {
       const isTrailingSpace = input.endsWith(" ");
       if (isTrailingSpace) inputParts.push("");
 
-      const cyclingPrefix = autocompletePrefix ?? inputParts[inputParts.length - 1];
+      const cyclingPrefix =
+        autocompletePrefix ?? inputParts[inputParts.length - 1];
 
       // Command autocomplete
       if (inputParts.length === 1 && cyclingPrefix !== "") {
-        const matches = filterAutocompleteMatches(Object.keys(commands), cyclingPrefix);
+        const matches = filterAutocompleteMatches(
+          Object.keys(commands),
+          cyclingPrefix
+        );
         if (matches.length > 0) {
-          if (shouldResetAutocomplete(autocompleteOptions, matches, cyclingPrefix, autocompletePrefix)) {
+          if (
+            shouldResetAutocomplete(
+              autocompleteOptions,
+              matches,
+              cyclingPrefix,
+              autocompletePrefix
+            )
+          ) {
             setAutocompleteOptions(matches);
             setAutocompleteIndex(0);
             setAutocompletePrefix(cyclingPrefix);
             setInput(updateInputWithMatch(inputParts, matches[0]));
             setHasUsedTab(true);
           } else {
-            const nextIndex = getNextAutocompleteIndex(autocompleteIndex, matches.length);
+            const nextIndex = getNextAutocompleteIndex(
+              autocompleteIndex,
+              matches.length
+            );
             setAutocompleteIndex(nextIndex);
             setInput(updateInputWithMatch(inputParts, matches[nextIndex ?? 0]));
             setHasUsedTab(true);
@@ -121,19 +143,33 @@ export default function Terminal() {
         // Directory/file autocomplete
         try {
           const currentDir = getCurrentDirectory(vfs);
-          const options = currentDir.children ? Object.keys(currentDir.children) : [];
+          const options = currentDir.children
+            ? Object.keys(currentDir.children)
+            : [];
           const matches = filterAutocompleteMatches(options, cyclingPrefix);
           if (matches.length > 0) {
-            if (shouldResetAutocomplete(autocompleteOptions, matches, cyclingPrefix, autocompletePrefix)) {
+            if (
+              shouldResetAutocomplete(
+                autocompleteOptions,
+                matches,
+                cyclingPrefix,
+                autocompletePrefix
+              )
+            ) {
               setAutocompleteOptions(matches);
               setAutocompleteIndex(0);
               setAutocompletePrefix(cyclingPrefix);
               setInput(updateInputWithMatch(inputParts, matches[0]));
               setHasUsedTab(true);
             } else {
-              const nextIndex = getNextAutocompleteIndex(autocompleteIndex, matches.length);
+              const nextIndex = getNextAutocompleteIndex(
+                autocompleteIndex,
+                matches.length
+              );
               setAutocompleteIndex(nextIndex);
-              setInput(updateInputWithMatch(inputParts, matches[nextIndex ?? 0]));
+              setInput(
+                updateInputWithMatch(inputParts, matches[nextIndex ?? 0])
+              );
               setHasUsedTab(true);
             }
           }
@@ -289,7 +325,10 @@ export default function Terminal() {
               )}
             </div>
           </div>
-          <div className="flex flex-col h-[60vh] p-4 overflow-auto whitespace-pre-wrap" ref={outputRef}>
+          <div
+            className="flex flex-col h-[60vh] p-4 overflow-auto whitespace-pre-wrap"
+            ref={outputRef}
+          >
             <TerminalHistory output={output} />
           </div>
           <form
@@ -345,6 +384,7 @@ export default function Terminal() {
                   setVfs((prev) => ({ ...prev, currentPath: [] }));
                 }}
                 onRefresh={handleRefresh}
+                wpm={wpm}
               />
             </div>
           </form>
