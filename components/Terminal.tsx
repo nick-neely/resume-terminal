@@ -1,29 +1,32 @@
-"use client";
+'use client';
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from '@/components/ui/card';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { commands } from '@/types/commands';
+import { executeCommand, parseCommand } from '@/utils/commandParser';
+import { downloadFile } from '@/utils/downloadFile';
+import { isValidCommand } from '@/utils/statusUtils';
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { commands } from "@/types/commands";
-import { executeCommand, parseCommand } from "@/utils/commandParser";
-import { downloadFile } from "@/utils/downloadFile";
-import { isValidCommand } from "@/utils/statusUtils";
-import { getCurrentDirectory, initialVFS } from "@/utils/virtualFileSystem";
-import {
-  desktopWelcomeMessage,
-  mobileWelcomeMessage,
-} from "@/utils/welcomeMessage";
-import { DownloadIcon, ExternalLinkIcon } from "lucide-react";
-import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { StatusLine } from "./StatusLine";
+  filterAutocompleteMatches,
+  getNextAutocompleteIndex,
+  shouldResetAutocomplete,
+  updateInputWithMatch,
+  handleAutocomplete,
+} from '@/utils/terminalUtils';
+import { getCurrentDirectory, initialVFS } from '@/utils/virtualFileSystem';
+import { desktopWelcomeMessage, mobileWelcomeMessage } from '@/utils/welcomeMessage';
+import { DownloadIcon, ExternalLinkIcon } from 'lucide-react';
+import Link from 'next/link';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useLiveWPM } from '../utils/wpmUtils';
+import { StatusLine } from './StatusLine';
+import TerminalHistory from './TerminalHistory';
+import TerminalInput from './TerminalInput';
 
 export default function Terminal() {
   const [isMobile, setIsMobile] = useState(false);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState('');
+  const [wpm, onWpmInput] = useLiveWPM();
   const [output, setOutput] = useState<string[]>([]);
   const outputRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -31,6 +34,9 @@ export default function Terminal() {
   const [, setHistoryIndex] = useState<number | null>(null);
   const [vfs, setVfs] = useState(initialVFS);
   const [hasUsedTab, setHasUsedTab] = useState(false);
+  const [autocompleteOptions, setAutocompleteOptions] = useState<string[]>([]);
+  const [autocompleteIndex, setAutocompleteIndex] = useState<number | null>(null);
+  const [autocompletePrefix, setAutocompletePrefix] = useState<string | null>(null);
 
   useEffect(() => {
     const checkWidth = () => {
@@ -38,20 +44,23 @@ export default function Terminal() {
     };
 
     checkWidth();
-    setOutput([
-      window.innerWidth < 768 ? mobileWelcomeMessage : desktopWelcomeMessage,
-    ]);
+    setOutput([window.innerWidth < 768 ? mobileWelcomeMessage : desktopWelcomeMessage]);
 
-    window.addEventListener("resize", checkWidth);
-    return () => window.removeEventListener("resize", checkWidth);
+    window.addEventListener('resize', checkWidth);
+    return () => window.removeEventListener('resize', checkWidth);
   }, []);
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value.replace(/[\u0000-\u001F]/g, "");
+      const value = e.target.value.replace(/[\u0000-\u001F]/g, '');
       setInput(value);
+      onWpmInput(value);
+      setHasUsedTab(false);
+      setAutocompleteOptions([]);
+      setAutocompletePrefix(null);
+      setAutocompleteIndex(0);
     },
-    []
+    [onWpmInput]
   );
 
   const handleInputSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -63,7 +72,7 @@ export default function Terminal() {
       vfs
     );
 
-    if (commandOutput === "CLEAR_TERMINAL") {
+    if (commandOutput === 'CLEAR_TERMINAL') {
       setOutput([]);
     } else {
       setOutput((prev) => [...prev, `$ ${input}`, commandOutput]);
@@ -74,79 +83,85 @@ export default function Terminal() {
       setCommandHistory((prev) => [...prev, input]);
     }
     setHistoryIndex(null);
-    setInput("");
+    setInput('');
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Tab") {
+    if (e.key === 'Tab') {
       e.preventDefault();
-      const inputParts = input.split(" ");
-      const isTrailingSpace = input.endsWith(" ");
+      const inputParts = input.split(' ');
+      const isTrailingSpace = input.endsWith(' ');
+      if (isTrailingSpace) inputParts.push('');
 
-      if (isTrailingSpace) {
-        inputParts.push("");
-      }
+      const cyclingPrefix = autocompletePrefix ?? inputParts[inputParts.length - 1];
 
-      const lastPart = inputParts[inputParts.length - 1];
-
-      if (inputParts.length === 1 && lastPart !== "") {
-        const matchingCommands = Object.keys(commands).filter((cmd) =>
-          cmd.startsWith(lastPart)
-        );
-        if (matchingCommands.length === 1) {
-          inputParts[0] = matchingCommands[0];
-          setInput(inputParts.join(" "));
-          setHasUsedTab(true);
-        }
+      if (inputParts.length === 1 && cyclingPrefix !== '') {
+        // Command autocomplete
+        handleAutocomplete({
+          cyclingPrefix,
+          options: Object.keys(commands),
+          inputParts,
+          autocompleteOptions,
+          autocompletePrefix,
+          autocompleteIndex,
+          setAutocompleteOptions,
+          setAutocompleteIndex,
+          setAutocompletePrefix,
+          setInput,
+          setHasUsedTab,
+        });
       } else {
+        // Directory/file autocomplete
         try {
           const currentDir = getCurrentDirectory(vfs);
-          const options = currentDir.children
-            ? Object.keys(currentDir.children)
-            : [];
-          const matchingOptions = options.filter((name) =>
-            name.startsWith(lastPart)
-          );
-          if (matchingOptions.length === 1) {
-            inputParts[inputParts.length - 1] = matchingOptions[0];
-            setInput(inputParts.join(" "));
-            setHasUsedTab(true);
-          }
+          const options = currentDir.children ? Object.keys(currentDir.children) : [];
+          handleAutocomplete({
+            cyclingPrefix,
+            options,
+            inputParts,
+            autocompleteOptions,
+            autocompletePrefix,
+            autocompleteIndex,
+            setAutocompleteOptions,
+            setAutocompleteIndex,
+            setAutocompletePrefix,
+            setInput,
+            setHasUsedTab,
+          });
         } catch (error) {
-          console.error("Error while autocompleting path:", error);
+          console.error('Error while autocompleting path:', error);
         }
       }
-    } else if (e.key === "ArrowUp") {
+    } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       setHistoryIndex((prev) => {
-        const newIndex =
-          prev === null ? commandHistory.length - 1 : Math.max(prev - 1, 0);
-        setInput(commandHistory[newIndex] || "");
+        const newIndex = prev === null ? commandHistory.length - 1 : Math.max(prev - 1, 0);
+        setInput(commandHistory[newIndex] || '');
         return newIndex;
       });
-    } else if (e.key === "ArrowDown") {
+    } else if (e.key === 'ArrowDown') {
       e.preventDefault();
       setHistoryIndex((prev) => {
         if (prev === null) return null;
         const newIndex = Math.min(prev + 1, commandHistory.length);
-        setInput(commandHistory[newIndex] || "");
+        setInput(commandHistory[newIndex] || '');
         return newIndex === commandHistory.length ? null : newIndex;
       });
     } else if (e.ctrlKey || e.metaKey) {
       switch (e.key.toLowerCase()) {
-        case "c":
+        case 'c':
           if (window.getSelection()?.toString()) {
             // Allow default copy if text is selected
             return;
           }
           e.preventDefault();
-          setOutput((prev) => [...prev, `$ ${input}`, "^C"]);
-          setInput("");
+          setOutput((prev) => [...prev, `$ ${input}`, '^C']);
+          setInput('');
           break;
-        case "v":
+        case 'v':
           // Allow default paste behavior
           return;
-        case "l":
+        case 'l':
           e.preventDefault();
           setOutput([]);
           break;
@@ -156,27 +171,22 @@ export default function Terminal() {
     }
   };
 
-  const handlePaste = useCallback(
-    (e: React.ClipboardEvent<HTMLInputElement>) => {
-      e.preventDefault();
-      const pastedText = e.clipboardData
-        .getData("text")
-        .replace(/[\u0000-\u001F]/g, "")
-        .trim();
-      setInput((prev) => prev + pastedText);
-    },
-    []
-  );
+  const handlePaste = useCallback((e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pastedText = e.clipboardData
+      .getData('text')
+      .replace(/[\u0000-\u001F]/g, '')
+      .trim();
+    setInput((prev) => prev + pastedText);
+  }, []);
 
   const handleDownload = () => {
-    downloadFile("resume.pdf");
+    downloadFile('resume.pdf');
   };
 
   const handleRefresh = useCallback(() => {
-    setInput("");
-    setOutput([
-      window.innerWidth < 768 ? mobileWelcomeMessage : desktopWelcomeMessage,
-    ]);
+    setInput('');
+    setOutput([window.innerWidth < 768 ? mobileWelcomeMessage : desktopWelcomeMessage]);
     setCommandHistory([]);
     setVfs(initialVFS);
     setHasUsedTab(false);
@@ -204,85 +214,100 @@ export default function Terminal() {
               <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
               <div className="w-3 h-3 rounded-full bg-green-500"></div>
             </div>
-            <div className="flex items-center gap-2">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Link
-                      href="/resume"
-                      className="p-1.5 text-zinc-400 hover:text-zinc-200 transition-colors rounded-md hover:bg-zinc-700/50"
-                    >
-                      <ExternalLinkIcon className="w-4 h-4" />
-                    </Link>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>View Resume</p>
-                  </TooltipContent>
-                </Tooltip>
-
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      onClick={handleDownload}
-                      className="p-1.5 text-zinc-400 hover:text-zinc-200 transition-colors rounded-md hover:bg-zinc-700/50"
-                    >
-                      <DownloadIcon className="w-4 h-4" />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Download Resume</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+            <div className={`flex items-center gap-2 ${isMobile ? 'mt-2 mb-2' : ''}`}>
+              {!isMobile ? (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Link
+                        href="/resume"
+                        tabIndex={0}
+                        className="p-1.5 text-zinc-400 hover:text-zinc-200 transition-colors rounded-md hover:bg-zinc-700/50"
+                        aria-label="View Resume"
+                      >
+                        <ExternalLinkIcon className="w-4 h-4" />
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>View Resume</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        onClick={handleDownload}
+                        tabIndex={0}
+                        className="p-1.5 text-zinc-400 hover:text-zinc-200 transition-colors rounded-md hover:bg-zinc-700/50"
+                        aria-label="Download Resume"
+                      >
+                        <DownloadIcon className="w-4 h-4" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Download Resume</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              ) : (
+                <>
+                  <Link
+                    href="/resume"
+                    tabIndex={0}
+                    className="p-3 text-zinc-400 hover:text-zinc-200 transition-colors rounded-lg hover:bg-zinc-700/50 min-w-[48px] min-h-[48px] flex items-center justify-center"
+                    aria-label="View Resume"
+                  >
+                    <ExternalLinkIcon className="w-7 h-7" />
+                  </Link>
+                  <button
+                    onClick={handleDownload}
+                    tabIndex={0}
+                    className="p-3 text-zinc-400 hover:text-zinc-200 transition-colors rounded-lg hover:bg-zinc-700/50 min-w-[48px] min-h-[48px] flex items-center justify-center"
+                    aria-label="Download Resume"
+                  >
+                    <DownloadIcon className="w-7 h-7" />
+                  </button>
+                </>
+              )}
             </div>
           </div>
           <div
+            className="flex flex-col h-[60vh] p-4 overflow-auto whitespace-pre-wrap"
             ref={outputRef}
-            className="h-[60vh] p-4 overflow-auto whitespace-pre-wrap"
           >
-            {output.map((line, index) => (
-              <div
-                key={index}
-                className={`mb-2 ${
-                  line.startsWith("$") ? "text-zinc-500" : ""
-                } ${index === 0 ? "animate-slide-in" : ""}`}
-              >
-                {line}
-              </div>
-            ))}
+            <TerminalHistory output={output} />
           </div>
-          <form
-            onSubmit={handleInputSubmit}
-            className="border-t border-zinc-700"
-          >
+          <form onSubmit={handleInputSubmit} className="border-t border-zinc-700">
             <div className="flex flex-col">
-              <div className="flex p-2 relative group">
-                <span className="text-zinc-500 mr-2 shrink-0 group-focus-within:text-zinc-300 transition-colors">
+              <div className={`flex p-2 relative group ${isMobile ? 'min-h-[56px]' : ''}`}>
+                <span
+                  className={
+                    `text-zinc-500 mr-2 shrink-0 group-focus-within:text-zinc-300 transition-colors ` +
+                    (isMobile ? 'text-lg pt-2' : '')
+                  }
+                  style={isMobile ? { minWidth: 32 } : {}}
+                >
                   $
                 </span>
-                <div className="relative flex-grow">
+                <div className={`relative flex-grow ${isMobile ? 'pt-1 pb-1' : ''}`}>
                   {!hasUsedTab && (
-                    <span className="absolute right-2 top-0 text-xs text-zinc-600 pointer-events-none animate-pulse">
+                    <span
+                      className={
+                        `absolute right-2 top-0 text-xs text-zinc-600 pointer-events-none animate-pulse ` +
+                        (isMobile ? 'top-2 right-3' : '')
+                      }
+                    >
                       Press Tab to autocomplete
                     </span>
                   )}
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={input}
-                    onChange={handleInputChange}
-                    onKeyDown={handleKeyDown}
-                    onPaste={handlePaste}
-                    spellCheck={false}
-                    autoCapitalize="none"
-                    autoComplete="off"
-                    autoCorrect="off"
-                    className="absolute w-full h-6 bg-transparent border-none text-transparent focus:outline-none focus:ring-0 caret-transparent"
+                  <TerminalInput
+                    input={input}
+                    setInput={setInput}
+                    handleKeyDown={handleKeyDown}
+                    handleInputChange={handleInputChange}
+                    handlePaste={handlePaste}
+                    inputRef={inputRef}
+                    isMobile={isMobile}
                   />
-                  <span className="whitespace-pre-wrap break-all">
-                    {input}
-                    <span className="animate-blink">▋</span>
-                  </span>
                 </div>
               </div>
               <StatusLine
@@ -293,6 +318,7 @@ export default function Terminal() {
                   setVfs((prev) => ({ ...prev, currentPath: [] }));
                 }}
                 onRefresh={handleRefresh}
+                wpm={wpm}
               />
             </div>
           </form>

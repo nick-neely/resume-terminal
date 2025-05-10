@@ -1,8 +1,17 @@
-"use client";
+'use client';
 
-import { getFormattedTime } from "@/utils/statusUtils";
-import { Clock, FolderIcon, Monitor, RefreshCcw, Smartphone, Terminal } from "lucide-react";
-import { useEffect, useState } from "react";
+import { getFormattedTime } from '@/utils/statusUtils';
+import {
+  Activity,
+  Clock,
+  FolderIcon,
+  Monitor,
+  RefreshCcw,
+  Smartphone,
+  Terminal,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { formatWpm } from '../utils/statusUtils';
 
 interface StatusLineProps {
   currentDirectory: string[];
@@ -10,6 +19,7 @@ interface StatusLineProps {
   isMobile: boolean;
   onHomeDirectory: () => void;
   onRefresh: () => void;
+  wpm: number;
 }
 
 export function StatusLine({
@@ -18,6 +28,7 @@ export function StatusLine({
   isMobile,
   onHomeDirectory,
   onRefresh,
+  wpm,
 }: StatusLineProps) {
   const [time, setTime] = useState(getFormattedTime());
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -44,19 +55,23 @@ export function StatusLine({
             onClick={onHomeDirectory}
           />
           <span className="transition-colors">
-            {currentDirectory.length === 0
-              ? "/"
-              : "/" + currentDirectory.join("/")}
+            {currentDirectory.length === 0 ? '/' : '/' + currentDirectory.join('/')}
           </span>
         </div>
         <div className="flex items-center gap-2">
           <Terminal className="w-4 h-4" />
           <span>
-            {validCommandCount} cmd{validCommandCount !== 1 ? "s" : ""}
+            {validCommandCount} cmd{validCommandCount !== 1 ? 's' : ''}
           </span>
         </div>
       </div>
       <div className="flex items-center gap-4">
+        {wpm > 0 && (
+          <span className="flex items-center gap-1 text-zinc-500">
+            <Activity className="w-4 h-4" />
+            {formatWpm(wpm)}
+          </span>
+        )}
         <RefreshCcw
           className={`w-4 h-4 hover:text-zinc-200 cursor-pointer pointer-events-auto transition-all ${
             isRefreshing ? 'animate-spin' : 'hover:scale-110 active:scale-95'

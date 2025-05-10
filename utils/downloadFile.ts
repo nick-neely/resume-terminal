@@ -1,4 +1,3 @@
-
 export const downloadFile = (fileName: string) => {
   const link = document.createElement('a');
   link.href = `/${fileName}`;

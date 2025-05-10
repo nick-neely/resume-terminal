@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import Terminal from "@/components/Terminal";
-import { TutorialOverlay } from "@/components/TutorialOverlay";
-import { PageTransition } from "@/components/PageTransition";
+import Terminal from '@/components/Terminal';
+import { TutorialOverlay } from '@/components/TutorialOverlay';
+import { PageTransition } from '@/components/PageTransition';
 
 export default function Home() {
   return (

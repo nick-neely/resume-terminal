@@ -1,8 +1,8 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 /**
@@ -15,34 +15,32 @@ export function getCompanyDuration(
   jobs: { startDate: string; endDate: string }[],
   now: Date = new Date()
 ): string {
-  if (!jobs.length) return "";
+  if (!jobs.length) return '';
 
   // More reliable date parsing
   const parseDate = (dateStr: string): Date => {
-    if (dateStr.toLowerCase() === "present") {
+    if (dateStr.toLowerCase() === 'present') {
       return now;
     }
 
     // Handle formats like "September 2015"
-    const parts = dateStr.split(" ");
+    const parts = dateStr.split(' ');
     if (parts.length === 2) {
       const monthNames = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December',
       ];
-      const monthIndex = monthNames.findIndex(
-        (m) => m.toLowerCase() === parts[0].toLowerCase()
-      );
+      const monthIndex = monthNames.findIndex((m) => m.toLowerCase() === parts[0].toLowerCase());
       const year = parseInt(parts[1]);
       if (monthIndex !== -1 && !isNaN(year)) {
         return new Date(year, monthIndex, 1);
@@ -78,13 +76,12 @@ export function getCompanyDuration(
   const years = Math.floor(months / 12);
   const remMonths = months % 12;
 
-  let result = "";
-  if (years > 0) result += `${years} yr${years > 1 ? "s" : ""}`;
+  let result = '';
+  if (years > 0) result += `${years} yr${years > 1 ? 's' : ''}`;
   if (remMonths > 0) {
-    result +=
-      (result ? " " : "") + `${remMonths} mo${remMonths > 1 ? "s" : ""}`;
+    result += (result ? ' ' : '') + `${remMonths} mo${remMonths > 1 ? 's' : ''}`;
   }
-  if (!result) result = "< 1 mo";
+  if (!result) result = '< 1 mo';
 
   return result;
 }

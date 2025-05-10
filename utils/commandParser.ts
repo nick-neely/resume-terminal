@@ -1,5 +1,5 @@
-import { Command, CommandRegistry } from "@/types/commands";
-import { VFS } from "./virtualFileSystem";
+import { Command, CommandRegistry } from '@/types/commands';
+import { VFS } from './virtualFileSystem';
 
 type ParsedCommand = {
   command: string;
@@ -10,15 +10,15 @@ export function parseCommand(input: string): ParsedCommand {
   input = input.trim();
 
   // Special case for 'cd..'
-  if (input.toLowerCase() === "cd..") {
+  if (input.toLowerCase() === 'cd..') {
     return {
-      command: "cd",
-      args: [".."],
+      command: 'cd',
+      args: ['..'],
     };
   }
 
   const result: ParsedCommand = {
-    command: "",
+    command: '',
     args: [],
   };
 
