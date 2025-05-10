@@ -57,8 +57,25 @@
 }
 
 @layer utilities {
-  .animate-blink {
-    animation: blink 1s step-end infinite;
+  /* Terminal block cursor blink: only background blinks, not text */
+  .blink-bg {
+    --cursor-bg: #e5e7eb;
+    --cursor-fg: #000;
+    background: var(--cursor-bg);
+    color: var(--cursor-fg);
+    animation: blink-cursor 1s step-end infinite;
+    transition: background 0.05s, color 0.05s;
+    display: inline-block;
+  }
+  @keyframes blink-cursor {
+    0%, 50% {
+      --cursor-bg: #e5e7eb;
+      --cursor-fg: #000;
+    }
+    50.01%, 100% {
+      --cursor-bg: transparent;
+      --cursor-fg: #e5e7eb; /* zinc-200 */
+    }
   }
 
   @keyframes slide-in {

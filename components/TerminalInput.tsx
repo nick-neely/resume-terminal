@@ -1,5 +1,5 @@
 import { Send } from "lucide-react";
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 
 interface TerminalInputProps {
   input: string;
@@ -20,9 +20,37 @@ const TerminalInput: React.FC<TerminalInputProps> = ({
   inputRef,
   isMobile,
 }) => {
+  const [caretPos, setCaretPos] = useState(input.length);
+
   useEffect(() => {
     inputRef.current?.focus();
   }, [inputRef]);
+
+  // Keep caretPos in sync if input changes externally
+  useEffect(() => {
+    setCaretPos((oldPos) => Math.min(oldPos, input.length));
+  }, [input]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+    // Use inputRef for selectionStart, fallback to end
+    const pos = inputRef.current?.selectionStart;
+    setCaretPos(typeof pos === "number" ? pos : e.target.value.length);
+    handleInputChange?.(e);
+  };
+
+  const handleKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    setTimeout(() => {
+      const pos = inputRef.current?.selectionStart;
+      setCaretPos(typeof pos === "number" ? pos : input.length);
+    }, 0);
+    handleKeyDown?.(e);
+  };
+
+  const handleClick = () => {
+    const pos = inputRef.current?.selectionStart;
+    setCaretPos(typeof pos === "number" ? pos : input.length);
+  };
 
   return (
     <div className="relative w-full">
@@ -30,8 +58,9 @@ const TerminalInput: React.FC<TerminalInputProps> = ({
         ref={inputRef}
         type="text"
         value={input}
-        onChange={handleInputChange}
-        onKeyDown={handleKeyDown}
+        onChange={handleChange}
+        onKeyDown={handleKey}
+        onClick={handleClick}
         onPaste={handlePaste}
         spellCheck={false}
         autoCapitalize="none"
@@ -53,8 +82,15 @@ const TerminalInput: React.FC<TerminalInputProps> = ({
         }
         style={isMobile ? { minHeight: 48 } : {}}
       >
-        {input}
-        <span className="animate-blink">▋</span>
+        {input.slice(0, caretPos)}
+        {caretPos < input.length ? (
+          <span className="blink-bg text-black relative">
+            {input[caretPos]}
+          </span>
+        ) : (
+          <span className="blink-bg text-black relative">&nbsp;</span>
+        )}
+        {input.slice(caretPos + 1)}
       </span>
       {/* Mobile submit button */}
       {isMobile && (
