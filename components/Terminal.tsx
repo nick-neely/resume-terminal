@@ -11,6 +11,7 @@ import {
   getNextAutocompleteIndex,
   shouldResetAutocomplete,
   updateInputWithMatch,
+  handleAutocomplete,
 } from '@/utils/terminalUtils';
 import { getCurrentDirectory, initialVFS } from '@/utils/virtualFileSystem';
 import { desktopWelcomeMessage, mobileWelcomeMessage } from '@/utils/welcomeMessage';
@@ -94,52 +95,39 @@ export default function Terminal() {
 
       const cyclingPrefix = autocompletePrefix ?? inputParts[inputParts.length - 1];
 
-      // Command autocomplete
       if (inputParts.length === 1 && cyclingPrefix !== '') {
-        const matches = filterAutocompleteMatches(Object.keys(commands), cyclingPrefix);
-        if (matches.length > 0) {
-          if (
-            shouldResetAutocomplete(autocompleteOptions, matches, cyclingPrefix, autocompletePrefix)
-          ) {
-            setAutocompleteOptions(matches);
-            setAutocompleteIndex(0);
-            setAutocompletePrefix(cyclingPrefix);
-            setInput(updateInputWithMatch(inputParts, matches[0]));
-            setHasUsedTab(true);
-          } else {
-            const nextIndex = getNextAutocompleteIndex(autocompleteIndex, matches.length);
-            setAutocompleteIndex(nextIndex);
-            setInput(updateInputWithMatch(inputParts, matches[nextIndex ?? 0]));
-            setHasUsedTab(true);
-          }
-        }
+        // Command autocomplete
+        handleAutocomplete({
+          cyclingPrefix,
+          options: Object.keys(commands),
+          inputParts,
+          autocompleteOptions,
+          autocompletePrefix,
+          autocompleteIndex,
+          setAutocompleteOptions,
+          setAutocompleteIndex,
+          setAutocompletePrefix,
+          setInput,
+          setHasUsedTab,
+        });
       } else {
         // Directory/file autocomplete
         try {
           const currentDir = getCurrentDirectory(vfs);
           const options = currentDir.children ? Object.keys(currentDir.children) : [];
-          const matches = filterAutocompleteMatches(options, cyclingPrefix);
-          if (matches.length > 0) {
-            if (
-              shouldResetAutocomplete(
-                autocompleteOptions,
-                matches,
-                cyclingPrefix,
-                autocompletePrefix
-              )
-            ) {
-              setAutocompleteOptions(matches);
-              setAutocompleteIndex(0);
-              setAutocompletePrefix(cyclingPrefix);
-              setInput(updateInputWithMatch(inputParts, matches[0]));
-              setHasUsedTab(true);
-            } else {
-              const nextIndex = getNextAutocompleteIndex(autocompleteIndex, matches.length);
-              setAutocompleteIndex(nextIndex);
-              setInput(updateInputWithMatch(inputParts, matches[nextIndex ?? 0]));
-              setHasUsedTab(true);
-            }
-          }
+          handleAutocomplete({
+            cyclingPrefix,
+            options,
+            inputParts,
+            autocompleteOptions,
+            autocompletePrefix,
+            autocompleteIndex,
+            setAutocompleteOptions,
+            setAutocompleteIndex,
+            setAutocompletePrefix,
+            setInput,
+            setHasUsedTab,
+          });
         } catch (error) {
           console.error('Error while autocompleting path:', error);
         }
