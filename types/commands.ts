@@ -5,11 +5,11 @@ import {
   getCurrentDirectory,
   listDirectory,
   readFile,
-} from "@/utils/virtualFileSystem";
+} from '@/utils/virtualFileSystem';
 
 export type CommandParameter = {
   name: string;
-  type: "string" | "number" | "boolean";
+  type: 'string' | 'number' | 'boolean';
   required: boolean;
   description: string;
 };
@@ -35,22 +35,22 @@ const commandHandlers = {
   tree: async (args: string[], vfs: VFS) => {
     if (args.length > 0) {
       return {
-        output: "Usage: tree",
+        output: 'Usage: tree',
         updatedVfs: vfs,
       };
     }
 
     const currentDir = getCurrentDirectory(vfs);
-    let output = "/\n";
+    let output = '/\n';
 
     const buildTree = (node: VFSNode, prefix: string, isLast: boolean) => {
-      const pointer = isLast ? "└── " : "├── ";
-      output += prefix + pointer + node.name + (node.type === "directory" ? "/" : "") + "\n";
-      if (node.type === "directory" && node.children) {
+      const pointer = isLast ? '└── ' : '├── ';
+      output += prefix + pointer + node.name + (node.type === 'directory' ? '/' : '') + '\n';
+      if (node.type === 'directory' && node.children) {
         const childEntries = Object.entries(node.children);
         childEntries.forEach(([_, child], idx) => {
           const lastChild = idx === childEntries.length - 1;
-          buildTree(child, prefix + (isLast ? "    " : "│   "), lastChild);
+          buildTree(child, prefix + (isLast ? '    ' : '│   '), lastChild);
         });
       }
     };
@@ -58,12 +58,12 @@ const commandHandlers = {
     const entries = Object.entries(currentDir.children ?? {});
     entries.forEach(([_, node], idx) => {
       const isLast = idx === entries.length - 1;
-      buildTree(node, "", isLast);
+      buildTree(node, '', isLast);
     });
 
     return {
       output: JSON.stringify({
-        type: "text-output",
+        type: 'text-output',
         content: output.trimEnd(),
       }),
       updatedVfs: vfs,
@@ -72,42 +72,38 @@ const commandHandlers = {
   copy: async (args: string[], vfs: VFS) => {
     if (args.length !== 1) {
       return {
-        output:
-          "Usage: copy <field> (where field is email, website, linkedin, or github)",
+        output: 'Usage: copy <field> (where field is email, website, linkedin, or github)',
         updatedVfs: vfs,
       };
     }
 
     const field = args[0].toLowerCase();
-    const contact =
-      vfs.root.children?.personalInfo?.children?.contact?.children;
+    const contact = vfs.root.children?.personalInfo?.children?.contact?.children;
 
     if (!contact) {
       return {
-        output: "Contact information not found",
+        output: 'Contact information not found',
         updatedVfs: vfs,
       };
     }
 
     const fieldMap: { [key: string]: string } = {
-      email: "email.txt",
-      website: "website.txt",
-      linkedin: "linkedin.txt",
-      github: "github.txt",
+      email: 'email.txt',
+      website: 'website.txt',
+      linkedin: 'linkedin.txt',
+      github: 'github.txt',
     };
 
     const fieldName = fieldMap[field];
     if (!fieldName) {
       return {
-        output: `Invalid field. Available fields: ${Object.keys(fieldMap).join(
-          ", "
-        )}`,
+        output: `Invalid field. Available fields: ${Object.keys(fieldMap).join(', ')}`,
         updatedVfs: vfs,
       };
     }
 
     const file = contact[fieldName];
-    if (!file || file.type !== "file" || !file.content) {
+    if (!file || file.type !== 'file' || !file.content) {
       return {
         output: `Field not found: ${field}`,
         updatedVfs: vfs,
@@ -123,7 +119,7 @@ const commandHandlers = {
     } catch (error) {
       return {
         output: `Failed to copy to clipboard: ${
-          error instanceof Error ? error.message : "Unknown error"
+          error instanceof Error ? error.message : 'Unknown error'
         }`,
         updatedVfs: vfs,
       };
@@ -134,7 +130,7 @@ const commandHandlers = {
       return {
         output: Object.values(commands)
           .map((cmd) => `${cmd.name}: ${cmd.description}`)
-          .join("\n"),
+          .join('\n'),
         updatedVfs: vfs,
       };
     } else {
@@ -151,7 +147,7 @@ const commandHandlers = {
   about: async (_args: string[], vfs: VFS) => {
     return {
       output:
-        "ResumeTerminal v1.0\nAn interactive command-line interface for exploring a personal resume.\nCreated with Next.js, React, and TypeScript.",
+        'ResumeTerminal v1.0\nAn interactive command-line interface for exploring a personal resume.\nCreated with Next.js, React, and TypeScript.',
       updatedVfs: vfs,
     };
   },
@@ -159,7 +155,7 @@ const commandHandlers = {
   grep: async (args: string[], vfs: VFS) => {
     if (args.length !== 1) {
       return {
-        output: "Usage: grep <keyword>",
+        output: 'Usage: grep <keyword>',
         updatedVfs: vfs,
       };
     }
@@ -171,14 +167,14 @@ const commandHandlers = {
 
     // Helper function to recursively search files
     const searchFiles = (node: VFSNode, path: string[] = []) => {
-      if (node.type === "file" && node.content) {
+      if (node.type === 'file' && node.content) {
         const content = node.content.toLowerCase();
         if (content.includes(keyword)) {
-          const lines = node.content.split("\n");
+          const lines = node.content.split('\n');
           lines.forEach((line, index) => {
             if (line.toLowerCase().includes(keyword)) {
               matches.push({
-                path: `${path.join("/")}/${node.name}`,
+                path: `${path.join('/')}/${node.name}`,
                 content: line,
                 line: `Line ${index + 1}`,
               });
@@ -186,7 +182,7 @@ const commandHandlers = {
             }
           });
         }
-      } else if (node.type === "directory" && node.children) {
+      } else if (node.type === 'directory' && node.children) {
         Object.entries(node.children).forEach(([name, child]) => {
           searchFiles(child, [...path, name]);
         });
@@ -204,7 +200,7 @@ const commandHandlers = {
 
     // Format the output as a special JSON string that our Terminal component will recognize
     const grepData = {
-      type: "grep-output",
+      type: 'grep-output',
       matches: matches.map(({ path, content, line }) => ({
         path,
         content,
@@ -222,10 +218,10 @@ const commandHandlers = {
   cd: async (args: string[], vfs: VFS) => {
     try {
       // Handle 'cd..' as 'cd ..'
-      const path = args[0] === "cd.." ? ".." : args[0] || "/";
+      const path = args[0] === 'cd..' ? '..' : args[0] || '/';
       const updatedVfs = changeDirectory(vfs, path);
       return {
-        output: `Changed directory to /${updatedVfs.currentPath.join("/")}`,
+        output: `Changed directory to /${updatedVfs.currentPath.join('/')}`,
         updatedVfs,
       };
     } catch (error) {
@@ -238,12 +234,12 @@ const commandHandlers = {
       const currentDir = getCurrentDirectory(vfs);
       const items = Object.entries(currentDir.children ?? {}).map(([name, node]) => ({
         name,
-        type: node.type
+        type: node.type,
       }));
       return {
         output: JSON.stringify({
           type: 'grid-output',
-          items
+          items,
         }),
         updatedVfs: vfs,
       };
@@ -254,7 +250,7 @@ const commandHandlers = {
 
   cat: async (args: string[], vfs: VFS) => {
     if (args.length === 0) {
-      return { output: "Usage: cat <filename>", updatedVfs: vfs };
+      return { output: 'Usage: cat <filename>', updatedVfs: vfs };
     }
 
     try {
@@ -264,18 +260,18 @@ const commandHandlers = {
         return {
           output: JSON.stringify({
             type: 'list-output',
-            items: content.split('\n').filter(line => line.trim() !== '')
+            items: content.split('\n').filter((line) => line.trim() !== ''),
           }),
-          updatedVfs: vfs
+          updatedVfs: vfs,
         };
       } else {
         // Single line: show as plain text
         return {
           output: JSON.stringify({
             type: 'text-output',
-            content: content
+            content: content,
           }),
-          updatedVfs: vfs
+          updatedVfs: vfs,
         };
       }
     } catch (error) {
@@ -284,116 +280,116 @@ const commandHandlers = {
   },
 
   clear: async (_args: string[], vfs: VFS) => {
-    return { output: "CLEAR_TERMINAL", updatedVfs: vfs };
+    return { output: 'CLEAR_TERMINAL', updatedVfs: vfs };
   },
 
   pwd: async (_args: string[], vfs: VFS) => {
-    return { output: `/${vfs.currentPath.join("/")}`, updatedVfs: vfs };
+    return { output: `/${vfs.currentPath.join('/')}`, updatedVfs: vfs };
   },
 };
 
 export const commands: CommandRegistry = {
   help: {
-    name: "help",
-    description: "Display information about available commands",
-    usage: "help [command]",
+    name: 'help',
+    description: 'Display information about available commands',
+    usage: 'help [command]',
     parameters: [
       {
-        name: "command",
-        type: "string",
+        name: 'command',
+        type: 'string',
         required: false,
-        description: "Specific command to get help for",
+        description: 'Specific command to get help for',
       },
     ],
     action: commandHandlers.help,
   },
   about: {
-    name: "about",
-    description: "Display information about this ResumeTerminal",
-    usage: "about",
+    name: 'about',
+    description: 'Display information about this ResumeTerminal',
+    usage: 'about',
     parameters: [],
     action: commandHandlers.about,
   },
   cd: {
-    name: "cd",
-    description: "Change current directory",
-    usage: "cd <directory> | cd..",
+    name: 'cd',
+    description: 'Change current directory',
+    usage: 'cd <directory> | cd..',
     parameters: [
       {
-        name: "directory",
-        type: "string",
+        name: 'directory',
+        type: 'string',
         required: true,
-        description: "The directory to change to",
+        description: 'The directory to change to',
       },
     ],
     action: commandHandlers.cd,
   },
   ls: {
-    name: "ls",
-    description: "List contents of current directory",
-    usage: "ls",
+    name: 'ls',
+    description: 'List contents of current directory',
+    usage: 'ls',
     parameters: [],
     action: commandHandlers.ls,
   },
   cat: {
-    name: "cat",
-    description: "Display file contents",
-    usage: "cat <file>",
+    name: 'cat',
+    description: 'Display file contents',
+    usage: 'cat <file>',
     parameters: [
       {
-        name: "file",
-        type: "string",
+        name: 'file',
+        type: 'string',
         required: true,
-        description: "The file to display",
+        description: 'The file to display',
       },
     ],
     action: commandHandlers.cat,
   },
   clear: {
-    name: "clear",
-    description: "Clear the terminal screen",
-    usage: "clear",
+    name: 'clear',
+    description: 'Clear the terminal screen',
+    usage: 'clear',
     parameters: [],
     action: commandHandlers.clear,
   },
   pwd: {
-    name: "pwd",
-    description: "Print current working directory",
-    usage: "pwd",
+    name: 'pwd',
+    description: 'Print current working directory',
+    usage: 'pwd',
     parameters: [],
     action: commandHandlers.pwd,
   },
   grep: {
-    name: "grep",
-    description: "Search for a specified pattern within files",
-    usage: "grep <keyword>",
+    name: 'grep',
+    description: 'Search for a specified pattern within files',
+    usage: 'grep <keyword>',
     parameters: [
       {
-        name: "keyword",
-        type: "string",
+        name: 'keyword',
+        type: 'string',
         required: true,
-        description: "The search term to look for in files",
+        description: 'The search term to look for in files',
       },
     ],
     action: commandHandlers.grep,
   },
   tree: {
-    name: "tree",
-    description: "Display the directory structure in a tree format",
-    usage: "tree",
+    name: 'tree',
+    description: 'Display the directory structure in a tree format',
+    usage: 'tree',
     parameters: [],
     action: commandHandlers.tree,
   },
   copy: {
-    name: "copy",
-    description: "Copy contact information to clipboard",
-    usage: "copy <field>",
+    name: 'copy',
+    description: 'Copy contact information to clipboard',
+    usage: 'copy <field>',
     parameters: [
       {
-        name: "field",
-        type: "string",
+        name: 'field',
+        type: 'string',
         required: true,
-        description: "The field to copy (email, website, linkedin, github)",
+        description: 'The field to copy (email, website, linkedin, github)',
       },
     ],
     action: commandHandlers.copy,

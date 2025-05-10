@@ -106,20 +106,10 @@ Each section is represented as an object or array of objects within the main res
 {
   "skills": {
     "programmingLanguages": ["JavaScript", "TypeScript", "Python", "Go"],
-    "frameworksAndLibraries": [
-      "React",
-      "Next.js",
-      "Node.js",
-      "Express",
-      "Tailwind CSS"
-    ],
+    "frameworksAndLibraries": ["React", "Next.js", "Node.js", "Express", "Tailwind CSS"],
     "databases": ["MongoDB", "PostgreSQL", "Redis"],
     "toolsAndPlatforms": ["Git", "Docker", "Kubernetes", "AWS", "Jest"],
-    "otherSkills": [
-      "Agile Methodologies",
-      "Team Leadership",
-      "Technical Writing"
-    ]
+    "otherSkills": ["Agile Methodologies", "Team Leadership", "Technical Writing"]
   }
 }
 ```

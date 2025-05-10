@@ -1,19 +1,13 @@
-"use client";
+'use client';
 
-import { downloadFile } from "@/utils/downloadFile";
-import { togglePrintMode } from "@/utils/printMode";
-import { AnimatePresence, motion } from "framer-motion";
-import {
-  DownloadIcon,
-  GithubIcon,
-  LinkedinIcon,
-  MenuIcon,
-  PrinterIcon,
-} from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { FeedbackForm } from "./FeedbackForm";
-import { Button } from "./ui/button";
-import { Drawer, DrawerContent, DrawerTrigger } from "./ui/drawer";
+import { downloadFile } from '@/utils/downloadFile';
+import { togglePrintMode } from '@/utils/printMode';
+import { AnimatePresence, motion } from 'framer-motion';
+import { DownloadIcon, GithubIcon, LinkedinIcon, MenuIcon, PrinterIcon } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { FeedbackForm } from './FeedbackForm';
+import { Button } from './ui/button';
+import { Drawer, DrawerContent, DrawerTrigger } from './ui/drawer';
 
 export function QuickMenu() {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,11 +20,11 @@ export function QuickMenu() {
   };
 
   const handleDownload = () => {
-    downloadFile("resume.pdf");
+    downloadFile('resume.pdf');
   };
 
   const handleProfileClick = (url: string) => {
-    window.open(url, "_blank");
+    window.open(url, '_blank');
   };
 
   useEffect(() => {
@@ -41,13 +35,13 @@ export function QuickMenu() {
     };
 
     if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside);
     } else {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isOpen]);
 
@@ -58,12 +52,10 @@ export function QuickMenu() {
         size="default"
         variant="ghost"
         className="w-full justify-start"
-        aria-label={isPrinting ? "Disable Print Mode" : "Enable Print Mode"}
+        aria-label={isPrinting ? 'Disable Print Mode' : 'Enable Print Mode'}
       >
         <PrinterIcon className="w-4 h-4 mr-2" />
-        <span className="text-sm">
-          {isPrinting ? "Disable" : "Enable"} Print
-        </span>
+        <span className="text-sm">{isPrinting ? 'Disable' : 'Enable'} Print</span>
       </Button>
 
       <Button
@@ -84,7 +76,7 @@ export function QuickMenu() {
       <div className="h-px bg-zinc-700/50 my-1" />
 
       <Button
-        onClick={() => handleProfileClick("https://github.com/nick-neely")}
+        onClick={() => handleProfileClick('https://github.com/nick-neely')}
         size="default"
         variant="ghost"
         className="w-full justify-start"
@@ -94,7 +86,7 @@ export function QuickMenu() {
       </Button>
 
       <Button
-        onClick={() => handleProfileClick("https://linkedin.com/in/nick-neely")}
+        onClick={() => handleProfileClick('https://linkedin.com/in/nick-neely')}
         size="default"
         variant="ghost"
         className="w-full justify-start"

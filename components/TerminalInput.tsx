@@ -1,5 +1,5 @@
-import { Send } from "lucide-react";
-import React, { useRef, useEffect, useState } from "react";
+import { Send } from 'lucide-react';
+import React, { useRef, useEffect, useState } from 'react';
 
 interface TerminalInputProps {
   input: string;
@@ -35,21 +35,21 @@ const TerminalInput: React.FC<TerminalInputProps> = ({
     setInput(e.target.value);
     // Use inputRef for selectionStart, fallback to end
     const pos = inputRef.current?.selectionStart;
-    setCaretPos(typeof pos === "number" ? pos : e.target.value.length);
+    setCaretPos(typeof pos === 'number' ? pos : e.target.value.length);
     handleInputChange?.(e);
   };
 
   const handleKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
     setTimeout(() => {
       const pos = inputRef.current?.selectionStart;
-      setCaretPos(typeof pos === "number" ? pos : input.length);
+      setCaretPos(typeof pos === 'number' ? pos : input.length);
     }, 0);
     handleKeyDown?.(e);
   };
 
   const handleClick = () => {
     const pos = inputRef.current?.selectionStart;
-    setCaretPos(typeof pos === "number" ? pos : input.length);
+    setCaretPos(typeof pos === 'number' ? pos : input.length);
   };
 
   return (
@@ -68,17 +68,17 @@ const TerminalInput: React.FC<TerminalInputProps> = ({
         autoCorrect="off"
         className={
           isMobile
-            ? "absolute w-full h-12 bg-transparent border-none text-transparent focus:outline-none focus:ring-0 caret-transparent touch-manipulation"
-            : "absolute w-full h-6 bg-transparent border-none text-transparent focus:outline-none focus:ring-0 caret-transparent"
+            ? 'absolute w-full h-12 bg-transparent border-none text-transparent focus:outline-none focus:ring-0 caret-transparent touch-manipulation'
+            : 'absolute w-full h-6 bg-transparent border-none text-transparent focus:outline-none focus:ring-0 caret-transparent'
         }
         style={isMobile ? { minHeight: 48, fontSize: 18, paddingLeft: 2 } : {}}
-        inputMode={isMobile ? "text" : undefined}
+        inputMode={isMobile ? 'text' : undefined}
         aria-label="Command input"
       />
       <span
         className={
           `whitespace-pre-wrap break-all pointer-events-none select-none absolute left-0 top-0 w-full ` +
-          (isMobile ? "text-lg min-h-[48px] pt-2" : "")
+          (isMobile ? 'text-lg min-h-[48px] pt-2' : '')
         }
         style={isMobile ? { minHeight: 48 } : {}}
       >

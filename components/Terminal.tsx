@@ -1,38 +1,30 @@
-"use client";
+'use client';
 
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { commands } from "@/types/commands";
-import { executeCommand, parseCommand } from "@/utils/commandParser";
-import { downloadFile } from "@/utils/downloadFile";
-import { isValidCommand } from "@/utils/statusUtils";
+import { Card, CardContent } from '@/components/ui/card';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { commands } from '@/types/commands';
+import { executeCommand, parseCommand } from '@/utils/commandParser';
+import { downloadFile } from '@/utils/downloadFile';
+import { isValidCommand } from '@/utils/statusUtils';
 import {
   filterAutocompleteMatches,
   getNextAutocompleteIndex,
   shouldResetAutocomplete,
   updateInputWithMatch,
-} from "@/utils/terminalUtils";
-import { getCurrentDirectory, initialVFS } from "@/utils/virtualFileSystem";
-import {
-  desktopWelcomeMessage,
-  mobileWelcomeMessage,
-} from "@/utils/welcomeMessage";
-import { DownloadIcon, ExternalLinkIcon } from "lucide-react";
-import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useLiveWPM } from "../utils/wpmUtils";
-import { StatusLine } from "./StatusLine";
-import TerminalHistory from "./TerminalHistory";
-import TerminalInput from "./TerminalInput";
+} from '@/utils/terminalUtils';
+import { getCurrentDirectory, initialVFS } from '@/utils/virtualFileSystem';
+import { desktopWelcomeMessage, mobileWelcomeMessage } from '@/utils/welcomeMessage';
+import { DownloadIcon, ExternalLinkIcon } from 'lucide-react';
+import Link from 'next/link';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useLiveWPM } from '../utils/wpmUtils';
+import { StatusLine } from './StatusLine';
+import TerminalHistory from './TerminalHistory';
+import TerminalInput from './TerminalInput';
 
 export default function Terminal() {
   const [isMobile, setIsMobile] = useState(false);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState('');
   const [wpm, onWpmInput] = useLiveWPM();
   const [output, setOutput] = useState<string[]>([]);
   const outputRef = useRef<HTMLDivElement>(null);
@@ -42,12 +34,8 @@ export default function Terminal() {
   const [vfs, setVfs] = useState(initialVFS);
   const [hasUsedTab, setHasUsedTab] = useState(false);
   const [autocompleteOptions, setAutocompleteOptions] = useState<string[]>([]);
-  const [autocompleteIndex, setAutocompleteIndex] = useState<number | null>(
-    null
-  );
-  const [autocompletePrefix, setAutocompletePrefix] = useState<string | null>(
-    null
-  );
+  const [autocompleteIndex, setAutocompleteIndex] = useState<number | null>(null);
+  const [autocompletePrefix, setAutocompletePrefix] = useState<string | null>(null);
 
   useEffect(() => {
     const checkWidth = () => {
@@ -55,17 +43,15 @@ export default function Terminal() {
     };
 
     checkWidth();
-    setOutput([
-      window.innerWidth < 768 ? mobileWelcomeMessage : desktopWelcomeMessage,
-    ]);
+    setOutput([window.innerWidth < 768 ? mobileWelcomeMessage : desktopWelcomeMessage]);
 
-    window.addEventListener("resize", checkWidth);
-    return () => window.removeEventListener("resize", checkWidth);
+    window.addEventListener('resize', checkWidth);
+    return () => window.removeEventListener('resize', checkWidth);
   }, []);
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value.replace(/[\u0000-\u001F]/g, "");
+      const value = e.target.value.replace(/[\u0000-\u001F]/g, '');
       setInput(value);
       onWpmInput(value);
       setHasUsedTab(false);
@@ -85,7 +71,7 @@ export default function Terminal() {
       vfs
     );
 
-    if (commandOutput === "CLEAR_TERMINAL") {
+    if (commandOutput === 'CLEAR_TERMINAL') {
       setOutput([]);
     } else {
       setOutput((prev) => [...prev, `$ ${input}`, commandOutput]);
@@ -96,33 +82,24 @@ export default function Terminal() {
       setCommandHistory((prev) => [...prev, input]);
     }
     setHistoryIndex(null);
-    setInput("");
+    setInput('');
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Tab") {
+    if (e.key === 'Tab') {
       e.preventDefault();
-      const inputParts = input.split(" ");
-      const isTrailingSpace = input.endsWith(" ");
-      if (isTrailingSpace) inputParts.push("");
+      const inputParts = input.split(' ');
+      const isTrailingSpace = input.endsWith(' ');
+      if (isTrailingSpace) inputParts.push('');
 
-      const cyclingPrefix =
-        autocompletePrefix ?? inputParts[inputParts.length - 1];
+      const cyclingPrefix = autocompletePrefix ?? inputParts[inputParts.length - 1];
 
       // Command autocomplete
-      if (inputParts.length === 1 && cyclingPrefix !== "") {
-        const matches = filterAutocompleteMatches(
-          Object.keys(commands),
-          cyclingPrefix
-        );
+      if (inputParts.length === 1 && cyclingPrefix !== '') {
+        const matches = filterAutocompleteMatches(Object.keys(commands), cyclingPrefix);
         if (matches.length > 0) {
           if (
-            shouldResetAutocomplete(
-              autocompleteOptions,
-              matches,
-              cyclingPrefix,
-              autocompletePrefix
-            )
+            shouldResetAutocomplete(autocompleteOptions, matches, cyclingPrefix, autocompletePrefix)
           ) {
             setAutocompleteOptions(matches);
             setAutocompleteIndex(0);
@@ -130,10 +107,7 @@ export default function Terminal() {
             setInput(updateInputWithMatch(inputParts, matches[0]));
             setHasUsedTab(true);
           } else {
-            const nextIndex = getNextAutocompleteIndex(
-              autocompleteIndex,
-              matches.length
-            );
+            const nextIndex = getNextAutocompleteIndex(autocompleteIndex, matches.length);
             setAutocompleteIndex(nextIndex);
             setInput(updateInputWithMatch(inputParts, matches[nextIndex ?? 0]));
             setHasUsedTab(true);
@@ -143,9 +117,7 @@ export default function Terminal() {
         // Directory/file autocomplete
         try {
           const currentDir = getCurrentDirectory(vfs);
-          const options = currentDir.children
-            ? Object.keys(currentDir.children)
-            : [];
+          const options = currentDir.children ? Object.keys(currentDir.children) : [];
           const matches = filterAutocompleteMatches(options, cyclingPrefix);
           if (matches.length > 0) {
             if (
@@ -162,52 +134,46 @@ export default function Terminal() {
               setInput(updateInputWithMatch(inputParts, matches[0]));
               setHasUsedTab(true);
             } else {
-              const nextIndex = getNextAutocompleteIndex(
-                autocompleteIndex,
-                matches.length
-              );
+              const nextIndex = getNextAutocompleteIndex(autocompleteIndex, matches.length);
               setAutocompleteIndex(nextIndex);
-              setInput(
-                updateInputWithMatch(inputParts, matches[nextIndex ?? 0])
-              );
+              setInput(updateInputWithMatch(inputParts, matches[nextIndex ?? 0]));
               setHasUsedTab(true);
             }
           }
         } catch (error) {
-          console.error("Error while autocompleting path:", error);
+          console.error('Error while autocompleting path:', error);
         }
       }
-    } else if (e.key === "ArrowUp") {
+    } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       setHistoryIndex((prev) => {
-        const newIndex =
-          prev === null ? commandHistory.length - 1 : Math.max(prev - 1, 0);
-        setInput(commandHistory[newIndex] || "");
+        const newIndex = prev === null ? commandHistory.length - 1 : Math.max(prev - 1, 0);
+        setInput(commandHistory[newIndex] || '');
         return newIndex;
       });
-    } else if (e.key === "ArrowDown") {
+    } else if (e.key === 'ArrowDown') {
       e.preventDefault();
       setHistoryIndex((prev) => {
         if (prev === null) return null;
         const newIndex = Math.min(prev + 1, commandHistory.length);
-        setInput(commandHistory[newIndex] || "");
+        setInput(commandHistory[newIndex] || '');
         return newIndex === commandHistory.length ? null : newIndex;
       });
     } else if (e.ctrlKey || e.metaKey) {
       switch (e.key.toLowerCase()) {
-        case "c":
+        case 'c':
           if (window.getSelection()?.toString()) {
             // Allow default copy if text is selected
             return;
           }
           e.preventDefault();
-          setOutput((prev) => [...prev, `$ ${input}`, "^C"]);
-          setInput("");
+          setOutput((prev) => [...prev, `$ ${input}`, '^C']);
+          setInput('');
           break;
-        case "v":
+        case 'v':
           // Allow default paste behavior
           return;
-        case "l":
+        case 'l':
           e.preventDefault();
           setOutput([]);
           break;
@@ -217,27 +183,22 @@ export default function Terminal() {
     }
   };
 
-  const handlePaste = useCallback(
-    (e: React.ClipboardEvent<HTMLInputElement>) => {
-      e.preventDefault();
-      const pastedText = e.clipboardData
-        .getData("text")
-        .replace(/[\u0000-\u001F]/g, "")
-        .trim();
-      setInput((prev) => prev + pastedText);
-    },
-    []
-  );
+  const handlePaste = useCallback((e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pastedText = e.clipboardData
+      .getData('text')
+      .replace(/[\u0000-\u001F]/g, '')
+      .trim();
+    setInput((prev) => prev + pastedText);
+  }, []);
 
   const handleDownload = () => {
-    downloadFile("resume.pdf");
+    downloadFile('resume.pdf');
   };
 
   const handleRefresh = useCallback(() => {
-    setInput("");
-    setOutput([
-      window.innerWidth < 768 ? mobileWelcomeMessage : desktopWelcomeMessage,
-    ]);
+    setInput('');
+    setOutput([window.innerWidth < 768 ? mobileWelcomeMessage : desktopWelcomeMessage]);
     setCommandHistory([]);
     setVfs(initialVFS);
     setHasUsedTab(false);
@@ -265,11 +226,7 @@ export default function Terminal() {
               <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
               <div className="w-3 h-3 rounded-full bg-green-500"></div>
             </div>
-            <div
-              className={`flex items-center gap-2 ${
-                isMobile ? "mt-2 mb-2" : ""
-              }`}
-            >
+            <div className={`flex items-center gap-2 ${isMobile ? 'mt-2 mb-2' : ''}`}>
               {!isMobile ? (
                 <TooltipProvider>
                   <Tooltip>
@@ -331,35 +288,24 @@ export default function Terminal() {
           >
             <TerminalHistory output={output} />
           </div>
-          <form
-            onSubmit={handleInputSubmit}
-            className="border-t border-zinc-700"
-          >
+          <form onSubmit={handleInputSubmit} className="border-t border-zinc-700">
             <div className="flex flex-col">
-              <div
-                className={`flex p-2 relative group ${
-                  isMobile ? "min-h-[56px]" : ""
-                }`}
-              >
+              <div className={`flex p-2 relative group ${isMobile ? 'min-h-[56px]' : ''}`}>
                 <span
                   className={
                     `text-zinc-500 mr-2 shrink-0 group-focus-within:text-zinc-300 transition-colors ` +
-                    (isMobile ? "text-lg pt-2" : "")
+                    (isMobile ? 'text-lg pt-2' : '')
                   }
                   style={isMobile ? { minWidth: 32 } : {}}
                 >
                   $
                 </span>
-                <div
-                  className={`relative flex-grow ${
-                    isMobile ? "pt-1 pb-1" : ""
-                  }`}
-                >
+                <div className={`relative flex-grow ${isMobile ? 'pt-1 pb-1' : ''}`}>
                   {!hasUsedTab && (
                     <span
                       className={
                         `absolute right-2 top-0 text-xs text-zinc-600 pointer-events-none animate-pulse ` +
-                        (isMobile ? "top-2 right-3" : "")
+                        (isMobile ? 'top-2 right-3' : '')
                       }
                     >
                       Press Tab to autocomplete

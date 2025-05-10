@@ -14,7 +14,6 @@ export interface GrepOutput extends BaseOutput {
   }[];
 }
 
-
 // Grid output type (for ls command)
 export interface GridOutput extends BaseOutput {
   type: 'grid-output';
@@ -43,9 +42,4 @@ export interface ListOutput extends BaseOutput {
   items: string[];
 }
 
-export type TerminalOutputType = 
-  | GrepOutput 
-  | GridOutput 
-  | ListOutput
-  | CommandOutput 
-  | TextOutput;
+export type TerminalOutputType = GrepOutput | GridOutput | ListOutput | CommandOutput | TextOutput;

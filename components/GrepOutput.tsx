@@ -16,12 +16,9 @@ export const GrepOutput: React.FC<GrepOutputProps> = ({ matches }) => {
     const parts = content.split(new RegExp(`(${keyword})`, 'gi'));
     return (
       <span>
-        {parts.map((part, i) => 
+        {parts.map((part, i) =>
           part.toLowerCase() === keyword.toLowerCase() ? (
-            <span 
-              key={i} 
-              className="font-bold underline text-yellow-400"
-            >
+            <span key={i} className="font-bold underline text-yellow-400">
               {part}
             </span>
           ) : (

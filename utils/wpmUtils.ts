@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
 // How long (ms) after last keypress before WPM resets
 const IDLE_TIMEOUT = 2000;
@@ -22,7 +22,7 @@ export function useLiveWPM() {
   const lastInputRef = useRef<number | null>(null);
   const startTimeRef = useRef<number | null>(null);
   const wordCountRef = useRef(0);
-  const lastTextRef = useRef("");
+  const lastTextRef = useRef('');
   const decayTimeout = useRef<NodeJS.Timeout | null>(null);
   const idleTimeout = useRef<NodeJS.Timeout | null>(null);
 
@@ -74,7 +74,7 @@ export function useLiveWPM() {
     } else if (wpm > 0) {
       // Decay WPM to zero when idle
       interval = setInterval(() => {
-        setWpm(prev => (prev > 2 ? prev - 2 : 0));
+        setWpm((prev) => (prev > 2 ? prev - 2 : 0));
       }, WPM_UPDATE_INTERVAL);
     }
 
@@ -83,12 +83,14 @@ export function useLiveWPM() {
     };
   }, [isTyping, wpm]);
 
-
   // Cleanup
-  useEffect(() => () => {
-    if (idleTimeout.current) clearTimeout(idleTimeout.current);
-    if (decayTimeout.current) clearInterval(decayTimeout.current);
-  }, []);
+  useEffect(
+    () => () => {
+      if (idleTimeout.current) clearTimeout(idleTimeout.current);
+      if (decayTimeout.current) clearInterval(decayTimeout.current);
+    },
+    []
+  );
 
   return [wpm, onInput] as const;
 }

@@ -1,5 +1,5 @@
-import React from "react";
-import { TerminalOutput } from "./TerminalOutput";
+import React from 'react';
+import { TerminalOutput } from './TerminalOutput';
 
 interface TerminalHistoryProps {
   output: string[];

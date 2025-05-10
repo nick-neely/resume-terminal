@@ -1,9 +1,17 @@
-"use client";
+'use client';
 
-import { getFormattedTime } from "@/utils/statusUtils";
-import { Activity, Clock, FolderIcon, Monitor, RefreshCcw, Smartphone, Terminal } from "lucide-react";
-import { useEffect, useState } from "react";
-import { formatWpm } from "../utils/statusUtils";
+import { getFormattedTime } from '@/utils/statusUtils';
+import {
+  Activity,
+  Clock,
+  FolderIcon,
+  Monitor,
+  RefreshCcw,
+  Smartphone,
+  Terminal,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { formatWpm } from '../utils/statusUtils';
 
 interface StatusLineProps {
   currentDirectory: string[];
@@ -47,15 +55,13 @@ export function StatusLine({
             onClick={onHomeDirectory}
           />
           <span className="transition-colors">
-            {currentDirectory.length === 0
-              ? "/"
-              : "/" + currentDirectory.join("/")}
+            {currentDirectory.length === 0 ? '/' : '/' + currentDirectory.join('/')}
           </span>
         </div>
         <div className="flex items-center gap-2">
           <Terminal className="w-4 h-4" />
           <span>
-            {validCommandCount} cmd{validCommandCount !== 1 ? "s" : ""}
+            {validCommandCount} cmd{validCommandCount !== 1 ? 's' : ''}
           </span>
         </div>
       </div>
