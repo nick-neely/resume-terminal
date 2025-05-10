@@ -66,6 +66,11 @@
     animation: blink-cursor 1s step-end infinite;
     transition: background 0.05s, color 0.05s;
     display: inline-block;
+    height: 1.1em; /* Make cursor height closer to text size */
+    line-height: 1.1em;
+    vertical-align: baseline;
+    padding-top: 0;
+    margin-top: 0;
   }
   @keyframes blink-cursor {
     0%, 50% {

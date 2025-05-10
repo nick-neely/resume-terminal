@@ -53,7 +53,7 @@ const TerminalInput: React.FC<TerminalInputProps> = ({
   };
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full h-6 overflow-hidden">
       <input
         ref={inputRef}
         type="text"
@@ -77,18 +77,16 @@ const TerminalInput: React.FC<TerminalInputProps> = ({
       />
       <span
         className={
-          `whitespace-pre-wrap break-all pointer-events-none select-none absolute left-0 top-0 w-full h-full px-0 ` +
+          `whitespace-pre-wrap break-all pointer-events-none select-none absolute left-0 top-0 w-full ` +
           (isMobile ? "text-lg min-h-[48px] pt-2" : "")
         }
         style={isMobile ? { minHeight: 48 } : {}}
       >
         {input.slice(0, caretPos)}
         {caretPos < input.length ? (
-          <span className="blink-bg text-black relative">
-            {input[caretPos]}
-          </span>
+          <span className="blink-bg text-black">{input[caretPos]}</span>
         ) : (
-          <span className="blink-bg text-black relative">&nbsp;</span>
+          <span className="blink-bg text-black">&nbsp;</span>
         )}
         {input.slice(caretPos + 1)}
       </span>
