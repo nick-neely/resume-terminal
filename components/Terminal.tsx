@@ -22,8 +22,7 @@ import {
   desktopWelcomeMessage,
   mobileWelcomeMessage,
 } from "@/utils/welcomeMessage";
-import { DownloadIcon, ExternalLinkIcon, Send } from "lucide-react";
-import { TerminalOutput } from "./TerminalOutput";
+import { DownloadIcon, ExternalLinkIcon } from "lucide-react";
 import TerminalInput from "./TerminalInput";
 import TerminalHistory from "./TerminalHistory";
 import Link from "next/link";
