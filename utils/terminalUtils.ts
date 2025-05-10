@@ -29,9 +29,7 @@ export function handleAutocomplete({
 }: HandleAutocompleteParams) {
   const matches = filterAutocompleteMatches(options, cyclingPrefix);
   if (matches.length > 0) {
-    if (
-      shouldResetAutocomplete(autocompleteOptions, matches, cyclingPrefix, autocompletePrefix)
-    ) {
+    if (shouldResetAutocomplete(autocompleteOptions, matches, cyclingPrefix, autocompletePrefix)) {
       setAutocompleteOptions(matches);
       setAutocompleteIndex(0);
       setAutocompletePrefix(cyclingPrefix);
