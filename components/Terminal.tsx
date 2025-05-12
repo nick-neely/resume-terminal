@@ -289,7 +289,7 @@ export default function Terminal() {
                   $
                 </span>
                 <div className={`relative flex-grow ${isMobile ? 'pt-1 pb-1' : ''}`}>
-                  {!hasUsedTab && (
+                  {!hasUsedTab && !isMobile && (
                     <span
                       className={
                         `absolute right-2 top-0 text-xs text-zinc-600 pointer-events-none animate-pulse ` +

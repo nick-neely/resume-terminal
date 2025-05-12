@@ -53,7 +53,11 @@ const TerminalInput: React.FC<TerminalInputProps> = ({
   };
 
   return (
-    <div className="relative w-full h-6 overflow-hidden">
+    <div className={
+      isMobile
+        ? "relative w-full min-h-[56px] h-14 flex items-center overflow-visible"
+        : "relative w-full h-6 overflow-hidden"
+    }>
       <input
         ref={inputRef}
         type="text"
@@ -78,7 +82,7 @@ const TerminalInput: React.FC<TerminalInputProps> = ({
       <span
         className={
           `whitespace-pre-wrap break-all pointer-events-none select-none absolute left-0 top-0 w-full ` +
-          (isMobile ? 'text-lg min-h-[48px] pt-2' : '')
+          (isMobile ? 'text-lg min-h-[48px] pt-3' : '')
         }
         style={isMobile ? { minHeight: 48 } : {}}
       >
@@ -95,7 +99,8 @@ const TerminalInput: React.FC<TerminalInputProps> = ({
         <button
           type="submit"
           aria-label="Send command"
-          className="absolute right-0 top-1/2 -translate-y-1/2 bg-zinc-700 text-zinc-200 rounded-full p-2 flex items-center justify-center shadow-md active:bg-zinc-800 focus:outline-none w-10 h-10"
+          className="absolute right-2 top-1/2 -translate-y-1/2 bg-zinc-700 text-zinc-200 rounded-full p-2 flex items-center justify-center shadow-md active:bg-zinc-800 focus:outline-none w-10 h-10"
+          style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
         >
           <Send className="w-5 h-5" />
         </button>
