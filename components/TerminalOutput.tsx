@@ -1,6 +1,7 @@
 import React from 'react';
 import { TerminalOutputType } from '@/types/terminalOutput';
 import { GrepOutput as GrepOutputComponent } from './GrepOutput';
+import { MatrixOutput } from './MatrixOutput';
 import { cn } from '@/lib/utils';
 
 interface TerminalOutputProps {
@@ -58,6 +59,13 @@ export const TerminalOutput: React.FC<TerminalOutputProps> = ({ output, index })
 
       case 'command-output':
         return <div className="mb-2 text-zinc-500">$ {data.command}</div>;
+
+      case 'matrix-output':
+        return (
+          <div className="mb-2">
+            <MatrixOutput lines={data.lines ?? 12} columns={data.columns ?? 32} cancelled={data.cancelled} />
+          </div>
+        );
 
       case 'text-output':
         return <div className="mb-2 text-zinc-200">{data.content}</div>;

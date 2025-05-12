@@ -36,10 +36,16 @@ export interface TextOutput extends BaseOutput {
 }
 
 // Union type of all possible outputs
+// Matrix output type (for matrix command)
+export interface MatrixOutput extends BaseOutput {
+  type: 'matrix-output';
+  lines?: number;
+  columns?: number;
+}
 // List output type (for multi-line text files)
 export interface ListOutput extends BaseOutput {
   type: 'list-output';
   items: string[];
 }
 
-export type TerminalOutputType = GrepOutput | GridOutput | ListOutput | CommandOutput | TextOutput;
+export type TerminalOutputType = GrepOutput | GridOutput | ListOutput | CommandOutput | TextOutput | MatrixOutput;

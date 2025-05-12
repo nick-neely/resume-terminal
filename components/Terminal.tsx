@@ -155,7 +155,23 @@ export default function Terminal() {
             return;
           }
           e.preventDefault();
-          setOutput((prev) => [...prev, `$ ${input}`, '^C']);
+          setOutput((prev) => {
+            // Check if last output is a matrix-output
+            if (prev.length > 0) {
+              try {
+                const lastIdx = prev.length - 1;
+                const last = prev[lastIdx];
+                const parsed = JSON.parse(last);
+                if (parsed.type === 'matrix-output' && !parsed.cancelled) {
+                  parsed.cancelled = true;
+                  const updated = [...prev];
+                  updated[lastIdx] = JSON.stringify(parsed);
+                  return [...updated, `$ ${input}`, '^C'];
+                }
+              } catch {}
+            }
+            return [...prev, `$ ${input}`, '^C'];
+          });
           setInput('');
           break;
         case 'v':

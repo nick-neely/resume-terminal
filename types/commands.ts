@@ -32,6 +32,23 @@ export interface CommandRegistry {
 }
 
 const commandHandlers = {
+  matrix: async (args: string[], vfs: VFS) => {
+    // Optionally allow user to specify lines/columns
+    let lines = 12;
+    let columns = 32;
+    if (args.length === 2 && !isNaN(Number(args[0])) && !isNaN(Number(args[1]))) {
+      lines = Math.max(4, Math.min(32, Number(args[0])));
+      columns = Math.max(8, Math.min(64, Number(args[1])));
+    }
+    return {
+      output: JSON.stringify({
+        type: 'matrix-output',
+        lines,
+        columns,
+      }),
+      updatedVfs: vfs,
+    };
+  },
   tree: async (args: string[], vfs: VFS) => {
     if (args.length > 0) {
       return {
@@ -309,6 +326,26 @@ export const commands: CommandRegistry = {
     usage: 'about',
     parameters: [],
     action: commandHandlers.about,
+  },
+  matrix: {
+    name: 'matrix',
+    description: 'Enter Matrix mode with green rain effect',
+    usage: 'matrix [lines] [columns]',
+    parameters: [
+      {
+        name: 'lines',
+        type: 'number',
+        required: false,
+        description: 'Number of lines (default 12, min 4, max 32)',
+      },
+      {
+        name: 'columns',
+        type: 'number',
+        required: false,
+        description: 'Number of columns (default 32, min 8, max 64)',
+      }
+    ],
+    action: commandHandlers.matrix,
   },
   cd: {
     name: 'cd',
