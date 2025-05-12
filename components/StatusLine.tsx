@@ -66,7 +66,7 @@ export function StatusLine({
         </div>
       </div>
       <div className="flex items-center gap-4">
-        {wpm > 0 && (
+        {wpm > 0 && !isMobile && (
           <span className="flex items-center gap-1 text-zinc-500">
             <Activity className="w-4 h-4" />
             {formatWpm(wpm)}
