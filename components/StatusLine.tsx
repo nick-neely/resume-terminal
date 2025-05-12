@@ -94,12 +94,14 @@ export function StatusLine({
         {isMobile ? (
           <Smartphone className="w-4 h-4 text-zinc-500" />
         ) : (
-          <Monitor className="w-4 h-4 text-zinc-500" />
+          <>
+            <Monitor className="w-4 h-4 text-zinc-500" />
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4" />
+              <span suppressHydrationWarning>{time}</span>
+            </div>
+          </>
         )}
-        <div className="flex items-center gap-2">
-          <Clock className="w-4 h-4" />
-          <span suppressHydrationWarning>{time}</span>
-        </div>
       </div>
     </div>
   );
