@@ -63,7 +63,11 @@ export const TerminalOutput: React.FC<TerminalOutputProps> = ({ output, index })
       case 'matrix-output':
         return (
           <div className="mb-2">
-            <MatrixOutput lines={data.lines ?? 12} columns={data.columns ?? 32} cancelled={data.cancelled} />
+            <MatrixOutput
+              lines={data.lines ?? 12}
+              columns={data.columns ?? 32}
+              cancelled={data.cancelled}
+            />
           </div>
         );
 

@@ -41,6 +41,7 @@ export interface MatrixOutput extends BaseOutput {
   type: 'matrix-output';
   lines?: number;
   columns?: number;
+  cancelled?: boolean;
 }
 // List output type (for multi-line text files)
 export interface ListOutput extends BaseOutput {
@@ -48,4 +49,10 @@ export interface ListOutput extends BaseOutput {
   items: string[];
 }
 
-export type TerminalOutputType = GrepOutput | GridOutput | ListOutput | CommandOutput | TextOutput | MatrixOutput;
+export type TerminalOutputType =
+  | GrepOutput
+  | GridOutput
+  | ListOutput
+  | CommandOutput
+  | TextOutput
+  | MatrixOutput;

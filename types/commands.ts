@@ -343,7 +343,7 @@ export const commands: CommandRegistry = {
         type: 'number',
         required: false,
         description: 'Number of columns (default 32, min 8, max 64)',
-      }
+      },
     ],
     action: commandHandlers.matrix,
   },
