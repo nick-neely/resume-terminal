@@ -22,6 +22,13 @@ interface StatusLineProps {
   wpm: number;
 }
 
+function truncatePath(segments: string[]) {
+  if (segments.length <= 2) return segments.join('/');
+  const first = segments[0];
+  const last = segments[segments.length - 1];
+  return `${first}/.../${last}`;
+}
+
 export function StatusLine({
   currentDirectory,
   validCommandCount,
@@ -54,8 +61,14 @@ export function StatusLine({
             className="w-4 h-4 hover:text-zinc-200 hover:scale-110 active:scale-95 transition-all cursor-pointer pointer-events-auto"
             onClick={onHomeDirectory}
           />
-          <span className="transition-colors">
-            {currentDirectory.length === 0 ? '/' : '/' + currentDirectory.join('/')}
+          <span className="transition-colors max-w-[120px] md:max-w-none truncate block">
+            {isMobile
+              ? (currentDirectory.length === 0
+                  ? '/'
+                  : '/' + truncatePath(currentDirectory))
+              : (currentDirectory.length === 0
+                  ? '/'
+                  : '/' + currentDirectory.join('/'))}
           </span>
         </div>
         <div className="flex items-center gap-2">
