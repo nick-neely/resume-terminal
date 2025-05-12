@@ -281,7 +281,7 @@ export default function Terminal() {
               <div className={`flex p-2 relative group ${isMobile ? 'min-h-[56px]' : ''}`}>
                 <span
                   className={
-                    `text-zinc-500 mr-2 shrink-0 group-focus-within:text-zinc-300 transition-colors ` +
+                    `text-zinc-500 mr-2 shrink-0 group-focus-within:text-blue-400 transition-colors ` +
                     (isMobile ? 'text-lg pt-2' : '')
                   }
                   style={isMobile ? { minWidth: 32 } : {}}
