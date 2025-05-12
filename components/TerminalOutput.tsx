@@ -2,6 +2,7 @@ import React from 'react';
 import { TerminalOutputType } from '@/types/terminalOutput';
 import { GrepOutput as GrepOutputComponent } from './GrepOutput';
 import { MatrixOutput } from './MatrixOutput';
+import { CoffeeOutput } from './CoffeeOutput';
 import { cn } from '@/lib/utils';
 
 interface TerminalOutputProps {
@@ -68,6 +69,13 @@ export const TerminalOutput: React.FC<TerminalOutputProps> = ({ output, index })
               columns={data.columns ?? 32}
               cancelled={data.cancelled}
             />
+          </div>
+        );
+
+      case 'coffee-output':
+        return (
+          <div className="mb-2">
+            <CoffeeOutput duration={data.duration ?? 2200} />
           </div>
         );
 

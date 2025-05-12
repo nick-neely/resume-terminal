@@ -32,6 +32,16 @@ export interface CommandRegistry {
 }
 
 const commandHandlers = {
+  coffee: async (_args: string[], vfs: VFS) => {
+    // Secret coffee command: returns coffee-output for animation
+    return {
+      output: JSON.stringify({
+        type: 'coffee-output',
+        duration: 60000, // Updated duration to 60 seconds
+      }),
+      updatedVfs: vfs,
+    };
+  },
   matrix: async (args: string[], vfs: VFS) => {
     // Optionally allow user to specify lines/columns
     let lines = 12;
@@ -306,6 +316,13 @@ const commandHandlers = {
 };
 
 export const commands: CommandRegistry = {
+  coffee: {
+    name: 'coffee',
+    description: '', // Secret: leave blank so it doesn't show in help
+    usage: 'coffee',
+    parameters: [],
+    action: commandHandlers.coffee,
+  },
   help: {
     name: 'help',
     description: 'Display information about available commands',
@@ -318,7 +335,27 @@ export const commands: CommandRegistry = {
         description: 'Specific command to get help for',
       },
     ],
-    action: commandHandlers.help,
+    action: async (args: string[], vfs: VFS) => {
+      // Filter out secret commands (like coffee) from help
+      const filteredCommands = Object.values(commands).filter(
+        (cmd) => cmd.name !== 'coffee' && cmd.description !== ''
+      );
+      if (args.length === 0) {
+        return {
+          output: filteredCommands.map((cmd) => `${cmd.name}: ${cmd.description}`).join('\n'),
+          updatedVfs: vfs,
+        };
+      } else {
+        const cmd = commands[args[0]];
+        return {
+          output:
+            cmd && cmd.name !== 'coffee' && cmd.description !== ''
+              ? `${cmd.name}: ${cmd.description}\nUsage: ${cmd.usage}`
+              : `Unknown command: ${args[0]}`,
+          updatedVfs: vfs,
+        };
+      }
+    },
   },
   about: {
     name: 'about',

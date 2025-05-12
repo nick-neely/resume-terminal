@@ -35,6 +35,12 @@ export interface TextOutput extends BaseOutput {
   content: string;
 }
 
+// Coffee output type (for the secret coffee command)
+export interface CoffeeOutputType extends BaseOutput {
+  type: 'coffee-output';
+  duration?: number;
+}
+
 // Union type of all possible outputs
 // Matrix output type (for matrix command)
 export interface MatrixOutput extends BaseOutput {
@@ -55,4 +61,5 @@ export type TerminalOutputType =
   | ListOutput
   | CommandOutput
   | TextOutput
-  | MatrixOutput;
+  | MatrixOutput
+  | CoffeeOutputType;
