@@ -53,11 +53,13 @@ const TerminalInput: React.FC<TerminalInputProps> = ({
   };
 
   return (
-    <div className={
-      isMobile
-        ? "relative w-full min-h-[56px] h-14 flex items-center overflow-visible"
-        : "relative w-full h-6 overflow-hidden"
-    }>
+    <div
+      className={
+        isMobile
+          ? 'relative w-full min-h-[56px] h-14 flex items-center overflow-visible'
+          : 'relative w-full h-6 overflow-hidden'
+      }
+    >
       <input
         ref={inputRef}
         type="text"

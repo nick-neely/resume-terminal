@@ -63,12 +63,12 @@ export function StatusLine({
           />
           <span className="transition-colors max-w-[120px] md:max-w-none truncate block">
             {isMobile
-              ? (currentDirectory.length === 0
-                  ? '/'
-                  : '/' + truncatePath(currentDirectory))
-              : (currentDirectory.length === 0
-                  ? '/'
-                  : '/' + currentDirectory.join('/'))}
+              ? currentDirectory.length === 0
+                ? '/'
+                : '/' + truncatePath(currentDirectory)
+              : currentDirectory.length === 0
+                ? '/'
+                : '/' + currentDirectory.join('/')}
           </span>
         </div>
         <div className="flex items-center gap-2">
