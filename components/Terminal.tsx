@@ -80,12 +80,12 @@ export default function Terminal() {
       if (typingStartTimeRef.current === null) {
         typingStartTimeRef.current = Date.now();
       }
-      
+
       // Track highest WPM
       if (wpm > highWpmRef.current) {
         highWpmRef.current = wpm;
       }
-      
+
       // Check if typing duration exceeds minimum and WPM exceeds threshold
       const typingDuration = Date.now() - (typingStartTimeRef.current || 0);
       if (typingDuration >= MIN_TYPING_DURATION && highWpmRef.current >= SPEED_DEMON_THRESHOLD) {
@@ -297,126 +297,126 @@ export default function Terminal() {
                 <div className="w-3 h-3 rounded-full bg-green-500"></div>
               </div>
               <div className={`flex items-center gap-2 ${isMobile ? 'mt-2 mb-2' : ''}`}>
-              {!isMobile ? (
-                <TooltipProvider>
-                  {speedDemonWpm && (
-                    <div className="mr-2">
-                      <SpeedDemonBadge wpm={speedDemonWpm} isMobile={isMobile} />
-                    </div>
-                  )}
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Link
-                        href="/resume"
-                        tabIndex={0}
-                        className="p-1.5 text-zinc-400 hover:text-zinc-200 transition-colors rounded-md hover:bg-zinc-700/50"
-                        aria-label="View Resume"
-                      >
-                        <ExternalLinkIcon className="w-4 h-4" />
-                      </Link>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>View Resume</p>
-                    </TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        onClick={handleDownload}
-                        tabIndex={0}
-                        className="p-1.5 text-zinc-400 hover:text-zinc-200 transition-colors rounded-md hover:bg-zinc-700/50"
-                        aria-label="Download Resume"
-                      >
-                        <DownloadIcon className="w-4 h-4" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Download Resume</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              ) : (
-                <>
-                  {speedDemonWpm && (
-                    <div className="mr-2">
-                      <SpeedDemonBadge wpm={speedDemonWpm} isMobile={isMobile} />
-                    </div>
-                  )}
-                  <Link
-                    href="/resume"
-                    tabIndex={0}
-                    className="p-3 text-zinc-400 hover:text-zinc-200 transition-colors rounded-lg hover:bg-zinc-700/50 min-w-[48px] min-h-[48px] flex items-center justify-center"
-                    aria-label="View Resume"
-                  >
-                    <ExternalLinkIcon className="w-7 h-7" />
-                  </Link>
-                  <button
-                    onClick={handleDownload}
-                    tabIndex={0}
-                    className="p-3 text-zinc-400 hover:text-zinc-200 transition-colors rounded-lg hover:bg-zinc-700/50 min-w-[48px] min-h-[48px] flex items-center justify-center"
-                    aria-label="Download Resume"
-                  >
-                    <DownloadIcon className="w-7 h-7" />
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-          <div
-            className="flex flex-col h-[60vh] p-4 overflow-auto whitespace-pre-wrap"
-            ref={outputRef}
-          >
-            <TerminalHistory output={output} />
-          </div>
-          <form onSubmit={handleInputSubmit} className="border-t border-zinc-700">
-            <div className="flex flex-col">
-              <div className={`flex p-2 relative group ${isMobile ? 'min-h-[56px]' : ''}`}>
-                <span
-                  className={
-                    `text-zinc-500 mr-2 shrink-0 group-focus-within:text-blue-400 transition-colors ` +
-                    (isMobile ? 'text-lg pt-2' : '')
-                  }
-                  style={isMobile ? { minWidth: 32 } : {}}
-                >
-                  $
-                </span>
-                <div className={`relative flex-grow ${isMobile ? 'pt-1 pb-1' : ''}`}>
-                  {!hasUsedTab && !isMobile && (
-                    <span
-                      className={
-                        `absolute right-2 top-0 text-xs text-zinc-600 pointer-events-none animate-pulse ` +
-                        (isMobile ? 'top-2 right-3' : '')
-                      }
+                {!isMobile ? (
+                  <TooltipProvider>
+                    {speedDemonWpm && (
+                      <div className="mr-2">
+                        <SpeedDemonBadge wpm={speedDemonWpm} isMobile={isMobile} />
+                      </div>
+                    )}
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Link
+                          href="/resume"
+                          tabIndex={0}
+                          className="p-1.5 text-zinc-400 hover:text-zinc-200 transition-colors rounded-md hover:bg-zinc-700/50"
+                          aria-label="View Resume"
+                        >
+                          <ExternalLinkIcon className="w-4 h-4" />
+                        </Link>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>View Resume</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={handleDownload}
+                          tabIndex={0}
+                          className="p-1.5 text-zinc-400 hover:text-zinc-200 transition-colors rounded-md hover:bg-zinc-700/50"
+                          aria-label="Download Resume"
+                        >
+                          <DownloadIcon className="w-4 h-4" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Download Resume</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                ) : (
+                  <>
+                    {speedDemonWpm && (
+                      <div className="mr-2">
+                        <SpeedDemonBadge wpm={speedDemonWpm} isMobile={isMobile} />
+                      </div>
+                    )}
+                    <Link
+                      href="/resume"
+                      tabIndex={0}
+                      className="p-3 text-zinc-400 hover:text-zinc-200 transition-colors rounded-lg hover:bg-zinc-700/50 min-w-[48px] min-h-[48px] flex items-center justify-center"
+                      aria-label="View Resume"
                     >
-                      Press Tab to autocomplete
-                    </span>
-                  )}
-                  <TerminalInput
-                    input={input}
-                    setInput={setInput}
-                    handleKeyDown={handleKeyDown}
-                    handleInputChange={handleInputChange}
-                    handlePaste={handlePaste}
-                    inputRef={inputRef}
-                    isMobile={isMobile}
-                  />
-                </div>
+                      <ExternalLinkIcon className="w-7 h-7" />
+                    </Link>
+                    <button
+                      onClick={handleDownload}
+                      tabIndex={0}
+                      className="p-3 text-zinc-400 hover:text-zinc-200 transition-colors rounded-lg hover:bg-zinc-700/50 min-w-[48px] min-h-[48px] flex items-center justify-center"
+                      aria-label="Download Resume"
+                    >
+                      <DownloadIcon className="w-7 h-7" />
+                    </button>
+                  </>
+                )}
               </div>
-              <StatusLine
-                currentDirectory={vfs.currentPath}
-                validCommandCount={commandHistory.length}
-                isMobile={isMobile}
-                onHomeDirectory={() => {
-                  setVfs((prev) => ({ ...prev, currentPath: [] }));
-                }}
-                onRefresh={handleRefresh}
-                wpm={wpm}
-              />
             </div>
-          </form>
-        </CardContent>
-      </Card>
-    )}
+            <div
+              className="flex flex-col h-[60vh] p-4 overflow-auto whitespace-pre-wrap"
+              ref={outputRef}
+            >
+              <TerminalHistory output={output} />
+            </div>
+            <form onSubmit={handleInputSubmit} className="border-t border-zinc-700">
+              <div className="flex flex-col">
+                <div className={`flex p-2 relative group ${isMobile ? 'min-h-[56px]' : ''}`}>
+                  <span
+                    className={
+                      `text-zinc-500 mr-2 shrink-0 group-focus-within:text-blue-400 transition-colors ` +
+                      (isMobile ? 'text-lg pt-2' : '')
+                    }
+                    style={isMobile ? { minWidth: 32 } : {}}
+                  >
+                    $
+                  </span>
+                  <div className={`relative flex-grow ${isMobile ? 'pt-1 pb-1' : ''}`}>
+                    {!hasUsedTab && !isMobile && (
+                      <span
+                        className={
+                          `absolute right-2 top-0 text-xs text-zinc-600 pointer-events-none animate-pulse ` +
+                          (isMobile ? 'top-2 right-3' : '')
+                        }
+                      >
+                        Press Tab to autocomplete
+                      </span>
+                    )}
+                    <TerminalInput
+                      input={input}
+                      setInput={setInput}
+                      handleKeyDown={handleKeyDown}
+                      handleInputChange={handleInputChange}
+                      handlePaste={handlePaste}
+                      inputRef={inputRef}
+                      isMobile={isMobile}
+                    />
+                  </div>
+                </div>
+                <StatusLine
+                  currentDirectory={vfs.currentPath}
+                  validCommandCount={commandHistory.length}
+                  isMobile={isMobile}
+                  onHomeDirectory={() => {
+                    setVfs((prev) => ({ ...prev, currentPath: [] }));
+                  }}
+                  onRefresh={handleRefresh}
+                  wpm={wpm}
+                />
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
     </TerminalDragMotion>
   );
 }

@@ -12,7 +12,7 @@ export const SpeedDemonBadge: React.FC<SpeedDemonBadgeProps> = ({ wpm, isMobile 
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <div 
+          <div
             className={`flex items-center gap-1 px-2 py-1 rounded-full bg-gradient-to-r from-amber-500 to-red-500 text-white font-semibold shadow-md ${
               isMobile ? 'text-xs' : 'text-xs'
             }`}

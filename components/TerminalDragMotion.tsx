@@ -18,9 +18,17 @@ export const TerminalDragMotion: React.FC<TerminalDragMotionProps> = ({ children
   // Playful resistance: bounce back if dragged too far
   const handleDragEnd = (_e: any, info: any) => {
     if (Math.abs(info.point.x) > 120 || Math.abs(info.point.y) > 60) {
-      controls.start({ x: 0, y: 0, rotate: 0, transition: { type: 'spring', stiffness: 400, damping: 20 } });
+      controls.start({
+        x: 0,
+        y: 0,
+        rotate: 0,
+        transition: { type: 'spring', stiffness: 400, damping: 20 },
+      });
     } else {
-      controls.start({ rotate: [0, 6, -6, 0], transition: { duration: 0.5, type: 'spring', bounce: 0.7 } });
+      controls.start({
+        rotate: [0, 6, -6, 0],
+        transition: { duration: 0.5, type: 'spring', bounce: 0.7 },
+      });
     }
   };
 
