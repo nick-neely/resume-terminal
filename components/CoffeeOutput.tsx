@@ -1,3 +1,4 @@
+import { Coffee } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 
 interface CoffeeOutputProps {
@@ -144,7 +145,7 @@ const CUP_LEVELS = [
     '          `-----------            ',
   ],
 ];
-
+``;
 const MAX_LEVEL = CUP_LEVELS.length - 1;
 
 export const CoffeeOutput: React.FC<CoffeeOutputProps> = ({ duration = 60000 }) => {
@@ -169,9 +170,25 @@ export const CoffeeOutput: React.FC<CoffeeOutputProps> = ({ duration = 60000 }) 
           <div key={i}>{line}</div>
         ))}
       </pre>
-      <div className="text-sm text-zinc-400 mt-3 animate-pulse">
+      <div className="text-xs text-zinc-400 mt-2 animate-pulse">
         {done ? 'Enjoy your break! ☕' : 'Brewing your coffee...'}
       </div>
+      {done && (
+        <div className="flex flex-col items-center mt-3">
+          <span className="text-xs text-zinc-400 mb-1">
+            If you enjoyed this,{' '}
+            <a
+              href="https://ko-fi.com/nickneely"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-amber-300 hover:text-amber-400 underline focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-colors"
+              aria-label="Buy me a coffee on Ko-fi"
+            >
+              buy me a coffee!
+            </a>
+          </span>
+        </div>
+      )}
     </div>
   );
 };
