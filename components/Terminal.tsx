@@ -24,6 +24,7 @@ import TerminalHistory from './TerminalHistory';
 import TerminalInput from './TerminalInput';
 import { SpeedDemonBadge } from './SpeedDemonBadge';
 import { TerminalDragMotion } from './TerminalDragMotion';
+import { IdleSignature } from './IdleSignature';
 
 // Local storage key for the speed demon badge
 const SPEED_DEMON_KEY = 'resume-terminal-speed-demon';
@@ -49,6 +50,36 @@ export default function Terminal() {
   const [speedDemonWpm, setSpeedDemonWpm] = useState<number | null>(null);
   const typingStartTimeRef = useRef<number | null>(null);
   const highWpmRef = useRef<number>(0);
+  const [idle, setIdle] = useState(false);
+  const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Idle detection (desktop only)
+  useEffect(() => {
+    if (isMobile) return;
+    const resetIdle = () => {
+      setIdle(false);
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+      idleTimerRef.current = setTimeout(() => setIdle(true), 2 * 60 * 1000); // 2 minutes
+    };
+    // Listen to all user activity
+    const events = [
+      'keydown',
+      'mousedown',
+      'mousemove',
+      'scroll',
+      'touchstart',
+      'focus',
+      'input',
+      'paste',
+      'click',
+    ];
+    events.forEach((evt) => window.addEventListener(evt, resetIdle, true));
+    resetIdle();
+    return () => {
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+      events.forEach((evt) => window.removeEventListener(evt, resetIdle, true));
+    };
+  }, [isMobile]);
 
   useEffect(() => {
     const checkWidth = () => {
@@ -266,10 +297,12 @@ export default function Terminal() {
   }, []);
 
   useEffect(() => {
-    if (outputRef.current) {
+    if (idle && outputRef.current) {
+      outputRef.current.scrollTop = 0;
+    } else if (outputRef.current) {
       outputRef.current.scrollTop = outputRef.current.scrollHeight;
     }
-  }, [output]);
+  }, [output, idle]);
 
   useEffect(() => {
     // Focus input on mount
@@ -279,7 +312,7 @@ export default function Terminal() {
   return (
     <TerminalDragMotion isMobile={isMobile}>
       {(dragControls) => (
-        <Card className="w-full max-w-3xl bg-zinc-900 text-zinc-100 font-mono shadow-lg border border-zinc-700 overflow-hidden">
+        <Card className="w-full max-w-3xl min-w-[718px] bg-zinc-900 text-zinc-100 font-mono shadow-lg border border-zinc-700 overflow-hidden">
           <CardContent className="p-0">
             <div
               className="flex items-center justify-between bg-zinc-800 px-4 py-2 border-b border-zinc-700 rounded-t-lg cursor-move select-none"
@@ -363,10 +396,10 @@ export default function Terminal() {
               </div>
             </div>
             <div
-              className="flex flex-col h-[60vh] p-4 overflow-auto whitespace-pre-wrap"
+              className="flex flex-col h-[60vh] min-h-[60vh] w-full min-w-full p-4 overflow-auto whitespace-pre-wrap relative"
               ref={outputRef}
             >
-              <TerminalHistory output={output} />
+              {!isMobile && idle ? <IdleSignature /> : <TerminalHistory output={output} />}
             </div>
             <form onSubmit={handleInputSubmit} className="border-t border-zinc-700">
               <div className="flex flex-col">
