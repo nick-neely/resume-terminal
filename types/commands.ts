@@ -316,13 +316,6 @@ const commandHandlers = {
 };
 
 export const commands: CommandRegistry = {
-  coffee: {
-    name: 'coffee',
-    description: '', // Secret: leave blank so it doesn't show in help
-    usage: 'coffee',
-    parameters: [],
-    action: commandHandlers.coffee,
-  },
   help: {
     name: 'help',
     description: 'Display information about available commands',
@@ -383,6 +376,13 @@ export const commands: CommandRegistry = {
       },
     ],
     action: commandHandlers.matrix,
+  },
+  coffee: {
+    name: 'coffee',
+    description: 'Take a virtual coffee break.',
+    usage: 'coffee',
+    parameters: [],
+    action: commandHandlers.coffee,
   },
   cd: {
     name: 'cd',
