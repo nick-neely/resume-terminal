@@ -23,6 +23,7 @@ import { StatusLine } from './StatusLine';
 import TerminalHistory from './TerminalHistory';
 import TerminalInput from './TerminalInput';
 import { SpeedDemonBadge } from './SpeedDemonBadge';
+import { TerminalDragMotion } from './TerminalDragMotion';
 
 // Local storage key for the speed demon badge
 const SPEED_DEMON_KEY = 'resume-terminal-speed-demon';
@@ -276,16 +277,26 @@ export default function Terminal() {
   }, []);
 
   return (
-    <>
-      <Card className="w-full max-w-3xl bg-zinc-900 text-zinc-100 font-mono shadow-lg border border-zinc-700 overflow-hidden">
-        <CardContent className="p-0">
-          <div className="flex items-center justify-between bg-zinc-800 px-4 py-2 border-b border-zinc-700 rounded-t-lg">
-            <div className="flex space-x-2">
-              <div className="w-3 h-3 rounded-full bg-red-500"></div>
-              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-              <div className="w-3 h-3 rounded-full bg-green-500"></div>
-            </div>
-            <div className={`flex items-center gap-2 ${isMobile ? 'mt-2 mb-2' : ''}`}>
+    <TerminalDragMotion>
+      {(dragControls) => (
+        <Card className="w-full max-w-3xl bg-zinc-900 text-zinc-100 font-mono shadow-lg border border-zinc-700 overflow-hidden">
+          <CardContent className="p-0">
+            <div
+              className="flex items-center justify-between bg-zinc-800 px-4 py-2 border-b border-zinc-700 rounded-t-lg cursor-move select-none"
+              onPointerDown={(e) => {
+                // Only left click
+                if (e.button === 0 && dragControls && dragControls.start) {
+                  dragControls.start(e);
+                }
+              }}
+              style={{ userSelect: 'none' }}
+            >
+              <div className="flex space-x-2">
+                <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              </div>
+              <div className={`flex items-center gap-2 ${isMobile ? 'mt-2 mb-2' : ''}`}>
               {!isMobile ? (
                 <TooltipProvider>
                   {speedDemonWpm && (
@@ -405,6 +416,7 @@ export default function Terminal() {
           </form>
         </CardContent>
       </Card>
-    </>
+    )}
+    </TerminalDragMotion>
   );
 }
