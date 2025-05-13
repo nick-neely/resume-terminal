@@ -2,14 +2,15 @@ import { motion, useMotionValue, useAnimation, useDragControls } from 'framer-mo
 import React from 'react';
 
 interface TerminalDragMotionProps {
-  children: (dragControls: ReturnType<typeof useDragControls>) => React.ReactNode;
+  children: (dragControls: ReturnType<typeof useDragControls> | null) => React.ReactNode;
+  isMobile?: boolean;
 }
 
 /**
  * Wraps terminal in a playful, fluid, draggable container.
  * Only allows drag from the top bar (via dragControls).
  */
-export const TerminalDragMotion: React.FC<TerminalDragMotionProps> = ({ children }) => {
+export const TerminalDragMotion: React.FC<TerminalDragMotionProps> = ({ children, isMobile }) => {
   const dragControls = useDragControls();
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -32,6 +33,13 @@ export const TerminalDragMotion: React.FC<TerminalDragMotionProps> = ({ children
     }
   };
 
+  if (isMobile) {
+    return (
+      <motion.div style={{ touchAction: 'none', zIndex: 50 }} className="relative select-none">
+        {children(null)}
+      </motion.div>
+    );
+  }
   return (
     <motion.div
       style={{ x, y, touchAction: 'none', zIndex: 50 }}

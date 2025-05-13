@@ -277,7 +277,7 @@ export default function Terminal() {
   }, []);
 
   return (
-    <TerminalDragMotion>
+    <TerminalDragMotion isMobile={isMobile}>
       {(dragControls) => (
         <Card className="w-full max-w-3xl bg-zinc-900 text-zinc-100 font-mono shadow-lg border border-zinc-700 overflow-hidden">
           <CardContent className="p-0">
