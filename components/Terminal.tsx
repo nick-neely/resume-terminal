@@ -22,6 +22,14 @@ import { useLiveWPM } from '../utils/wpmUtils';
 import { StatusLine } from './StatusLine';
 import TerminalHistory from './TerminalHistory';
 import TerminalInput from './TerminalInput';
+import { SpeedDemonBadge } from './SpeedDemonBadge';
+
+// Local storage key for the speed demon badge
+const SPEED_DEMON_KEY = 'resume-terminal-speed-demon';
+// WPM threshold for the speed demon badge
+const SPEED_DEMON_THRESHOLD = 100;
+// Minimum typing duration in ms (10 seconds)
+const MIN_TYPING_DURATION = 10000;
 
 export default function Terminal() {
   const [isMobile, setIsMobile] = useState(false);
@@ -37,6 +45,9 @@ export default function Terminal() {
   const [autocompleteOptions, setAutocompleteOptions] = useState<string[]>([]);
   const [autocompleteIndex, setAutocompleteIndex] = useState<number | null>(null);
   const [autocompletePrefix, setAutocompletePrefix] = useState<string | null>(null);
+  const [speedDemonWpm, setSpeedDemonWpm] = useState<number | null>(null);
+  const typingStartTimeRef = useRef<number | null>(null);
+  const highWpmRef = useRef<number>(0);
 
   useEffect(() => {
     const checkWidth = () => {
@@ -46,9 +57,53 @@ export default function Terminal() {
     checkWidth();
     setOutput([window.innerWidth < 768 ? mobileWelcomeMessage : desktopWelcomeMessage]);
 
+    // Load speed demon badge from localStorage if it exists
+    try {
+      const savedSpeedDemon = localStorage.getItem(SPEED_DEMON_KEY);
+      if (savedSpeedDemon) {
+        setSpeedDemonWpm(parseInt(savedSpeedDemon, 10));
+      }
+    } catch (e) {
+      console.error('Error loading speed demon badge from localStorage', e);
+    }
+
     window.addEventListener('resize', checkWidth);
     return () => window.removeEventListener('resize', checkWidth);
   }, []);
+
+  // Track high WPM and check for speed demon achievement
+  useEffect(() => {
+    // Only track when actively typing
+    if (wpm > 0) {
+      // Start tracking typing duration
+      if (typingStartTimeRef.current === null) {
+        typingStartTimeRef.current = Date.now();
+      }
+      
+      // Track highest WPM
+      if (wpm > highWpmRef.current) {
+        highWpmRef.current = wpm;
+      }
+      
+      // Check if typing duration exceeds minimum and WPM exceeds threshold
+      const typingDuration = Date.now() - (typingStartTimeRef.current || 0);
+      if (typingDuration >= MIN_TYPING_DURATION && highWpmRef.current >= SPEED_DEMON_THRESHOLD) {
+        // Award speed demon badge if it's a new record
+        if (!speedDemonWpm || highWpmRef.current > speedDemonWpm) {
+          setSpeedDemonWpm(highWpmRef.current);
+          try {
+            localStorage.setItem(SPEED_DEMON_KEY, highWpmRef.current.toString());
+          } catch (e) {
+            console.error('Error saving speed demon badge to localStorage', e);
+          }
+        }
+      }
+    } else {
+      // Reset tracking when not typing
+      typingStartTimeRef.current = null;
+      highWpmRef.current = 0;
+    }
+  }, [wpm, speedDemonWpm]);
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -233,6 +288,11 @@ export default function Terminal() {
             <div className={`flex items-center gap-2 ${isMobile ? 'mt-2 mb-2' : ''}`}>
               {!isMobile ? (
                 <TooltipProvider>
+                  {speedDemonWpm && (
+                    <div className="mr-2">
+                      <SpeedDemonBadge wpm={speedDemonWpm} isMobile={isMobile} />
+                    </div>
+                  )}
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Link
@@ -266,6 +326,11 @@ export default function Terminal() {
                 </TooltipProvider>
               ) : (
                 <>
+                  {speedDemonWpm && (
+                    <div className="mr-2">
+                      <SpeedDemonBadge wpm={speedDemonWpm} isMobile={isMobile} />
+                    </div>
+                  )}
                   <Link
                     href="/resume"
                     tabIndex={0}
