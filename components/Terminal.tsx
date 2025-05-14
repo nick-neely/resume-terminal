@@ -328,7 +328,13 @@ export default function Terminal() {
   return (
     <TerminalDragMotion isMobile={isMobile}>
       {(dragControls) => (
-        <Card className="w-full max-w-3xl min-w-[718px] bg-zinc-900 text-zinc-100 font-mono shadow-lg border border-zinc-700 overflow-hidden">
+        <Card
+          className={`${
+            isMobile
+              ? 'w-[90vw] max-w-[480px] mx-auto'
+              : 'w-full max-w-3xl min-w-[718px]'
+          } bg-zinc-900 text-zinc-100 font-mono shadow-lg border border-zinc-700 overflow-hidden`}
+        >
           <CardContent className="p-0">
             <div
               className="flex items-center justify-between bg-zinc-800 px-4 py-2 border-b border-zinc-700 rounded-t-lg cursor-move select-none"
@@ -415,7 +421,9 @@ export default function Terminal() {
               className="flex flex-col h-[60vh] min-h-[60vh] w-full min-w-full p-4 overflow-auto whitespace-pre-wrap relative"
               ref={outputRef}
             >
-              {!isMobile && idle ? <IdleSignature /> : (
+              {!isMobile && idle ? (
+                <IdleSignature />
+              ) : (
                 output.map((entry, i) => (
                   <TerminalOutput
                     key={i}
