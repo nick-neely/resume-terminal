@@ -4,10 +4,17 @@ import { useEffect, useRef, useState } from 'react';
 const IDLE_TIMEOUT = 2000;
 // How often to update the displayed WPM (ms)
 const WPM_UPDATE_INTERVAL = 200;
+// Minimum ms typing before calculating WPM to avoid huge spikes from initial words
+const MIN_TIME_FOR_WPM_MS = 3000;
+
+// A quick heuristic: a “real” word is at least 3 letters long and contains a vowel
+const REAL_WORD_REGEX = /^(?=.{3,}$)[a-z]+[aeiou][a-z]*$/i;
 
 function countWords(text: string) {
-  // Split by whitespace, ignore empty
-  return text.trim().split(/\s+/).filter(Boolean).length;
+  return text
+    .trim()
+    .split(/\s+/)
+    .filter((w) => REAL_WORD_REGEX.test(w)).length;
 }
 
 /**
@@ -23,7 +30,6 @@ export function useLiveWPM() {
   const startTimeRef = useRef<number | null>(null);
   const wordCountRef = useRef(0);
   const lastTextRef = useRef('');
-  const decayTimeout = useRef<NodeJS.Timeout | null>(null);
   const idleTimeout = useRef<NodeJS.Timeout | null>(null);
 
   // Call this on every input change
@@ -60,12 +66,15 @@ export function useLiveWPM() {
     if (isTyping) {
       interval = setInterval(() => {
         const now = Date.now();
-        const elapsed = startTimeRef.current ? (now - startTimeRef.current) / 60000 : 0;
+        const start = startTimeRef.current || now;
+        const elapsedMs = now - start;
+        const elapsedMinutes = elapsedMs / 60000;
         const baselineWords = wordCountRef.current;
         const currentWords = countWords(lastTextRef.current);
         const deltaWords = currentWords - baselineWords;
-        if (elapsed > 0.008 && deltaWords > 0) {
-          const calculatedWpm = Math.round(deltaWords / elapsed);
+        // Only calculate after a minimum typing time
+        if (elapsedMs >= MIN_TIME_FOR_WPM_MS && deltaWords > 0) {
+          const calculatedWpm = Math.round(deltaWords / elapsedMinutes);
           if (calculatedWpm !== wpm) setWpm(calculatedWpm);
         } else if (wpm !== 0) {
           setWpm(0);
@@ -87,7 +96,6 @@ export function useLiveWPM() {
   useEffect(
     () => () => {
       if (idleTimeout.current) clearTimeout(idleTimeout.current);
-      if (decayTimeout.current) clearInterval(decayTimeout.current);
     },
     []
   );
