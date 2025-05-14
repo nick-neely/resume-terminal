@@ -330,9 +330,7 @@ export default function Terminal() {
       {(dragControls) => (
         <Card
           className={`${
-            isMobile
-              ? 'w-[90vw] max-w-[480px] mx-auto'
-              : 'w-full max-w-3xl min-w-[718px]'
+            isMobile ? 'w-[90vw] max-w-[480px] mx-auto' : 'w-full max-w-3xl min-w-[718px]'
           } bg-zinc-900 text-zinc-100 font-mono shadow-lg border border-zinc-700 overflow-hidden`}
         >
           <CardContent className="p-0">

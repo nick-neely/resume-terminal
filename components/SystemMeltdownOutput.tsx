@@ -35,7 +35,10 @@ interface SystemMeltdownOutputProps {
   onComplete?: () => void;
 }
 
-export const SystemMeltdownOutput: React.FC<SystemMeltdownOutputProps> = ({ isStatic = false, onComplete }) => {
+export const SystemMeltdownOutput: React.FC<SystemMeltdownOutputProps> = ({
+  isStatic = false,
+  onComplete,
+}) => {
   const [lines, setLines] = useState<string[]>([]);
   const [currentLine, setCurrentLine] = useState(0);
   const [showBSOD, setShowBSOD] = useState(false);
