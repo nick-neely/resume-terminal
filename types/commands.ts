@@ -286,6 +286,33 @@ const commandHandlers = {
   pwd: async (_args: string[], vfs: VFS) => {
     return { output: `/${vfs.currentPath.join('/')}`, updatedVfs: vfs };
   },
+
+  game: async (args: string[], vfs: VFS) => {
+    if (args.length !== 1) {
+      return {
+        output: 'Usage: game <name> (available games: tictactoe, snake, hangman)',
+        updatedVfs: vfs,
+      };
+    }
+
+    const gameName = args[0].toLowerCase();
+    const availableGames = ['tictactoe', 'snake', 'hangman'];
+
+    if (!availableGames.includes(gameName)) {
+      return {
+        output: `Invalid game. Available games: ${availableGames.join(', ')}`,
+        updatedVfs: vfs,
+      };
+    }
+
+    return {
+      output: JSON.stringify({
+        type: 'game-output',
+        game: gameName,
+      }),
+      updatedVfs: vfs,
+    };
+  },
 };
 
 export const commands: CommandRegistry = {
@@ -393,5 +420,19 @@ export const commands: CommandRegistry = {
       },
     ],
     action: commandHandlers.copy,
+  },
+  game: {
+    name: 'game',
+    description: 'Launch a terminal-based game',
+    usage: 'game <name>',
+    parameters: [
+      {
+        name: 'name',
+        type: 'string',
+        required: true,
+        description: 'The game to launch (tictactoe, snake, hangman)',
+      },
+    ],
+    action: commandHandlers.game,
   },
 };

@@ -2,6 +2,7 @@ import React from 'react';
 import { TerminalOutputType } from '@/types/terminalOutput';
 import { GrepOutput as GrepOutputComponent } from './GrepOutput';
 import { cn } from '@/lib/utils';
+import TicTacToe from './games/TicTacToe';
 
 interface TerminalOutputProps {
   output: string;
@@ -61,6 +62,19 @@ export const TerminalOutput: React.FC<TerminalOutputProps> = ({ output, index })
 
       case 'text-output':
         return <div className="mb-2 text-zinc-200">{data.content}</div>;
+
+      case 'game-output':
+        switch (data.game) {
+          case 'tictactoe':
+            return <TicTacToe />;
+          case 'snake':
+          case 'hangman':
+            return (
+              <div className="mb-2 text-zinc-200">Game &apos;{data.game}&apos; coming soon!</div>
+            );
+          default:
+            return <div className="mb-2 text-zinc-200">Unknown game type</div>;
+        }
     }
   } catch {
     // Default text rendering for non-structured output

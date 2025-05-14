@@ -42,4 +42,16 @@ export interface ListOutput extends BaseOutput {
   items: string[];
 }
 
-export type TerminalOutputType = GrepOutput | GridOutput | ListOutput | CommandOutput | TextOutput;
+export interface GameOutput extends BaseOutput {
+  type: 'game-output';
+  game: 'tictactoe' | 'snake' | 'hangman';
+  state?: any; // Game state will be managed by individual game components
+}
+
+export type TerminalOutputType =
+  | GrepOutput
+  | GridOutput
+  | ListOutput
+  | CommandOutput
+  | TextOutput
+  | GameOutput;
