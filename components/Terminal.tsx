@@ -22,6 +22,17 @@ import { useLiveWPM } from '../utils/wpmUtils';
 import { StatusLine } from './StatusLine';
 import TerminalHistory from './TerminalHistory';
 import TerminalInput from './TerminalInput';
+import { TerminalOutput } from './TerminalOutput';
+import { SpeedDemonBadge } from './SpeedDemonBadge';
+import { TerminalDragMotion } from './TerminalDragMotion';
+import { IdleSignature } from './IdleSignature';
+
+// Local storage key for the speed demon badge
+const SPEED_DEMON_KEY = 'resume-terminal-speed-demon';
+// WPM threshold for the speed demon badge
+const SPEED_DEMON_THRESHOLD = 100;
+// Minimum typing duration in ms (10 seconds)
+const MIN_TYPING_DURATION = 10000;
 
 export default function Terminal() {
   const [isMobile, setIsMobile] = useState(false);
@@ -37,6 +48,39 @@ export default function Terminal() {
   const [autocompleteOptions, setAutocompleteOptions] = useState<string[]>([]);
   const [autocompleteIndex, setAutocompleteIndex] = useState<number | null>(null);
   const [autocompletePrefix, setAutocompletePrefix] = useState<string | null>(null);
+  const [speedDemonWpm, setSpeedDemonWpm] = useState<number | null>(null);
+  const typingStartTimeRef = useRef<number | null>(null);
+  const highWpmRef = useRef<number>(0);
+  const [idle, setIdle] = useState(false);
+  const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Idle detection (desktop only)
+  useEffect(() => {
+    if (isMobile) return;
+    const resetIdle = () => {
+      setIdle(false);
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+      idleTimerRef.current = setTimeout(() => setIdle(true), 2 * 60 * 1000); // 2 minutes
+    };
+    // Listen to all user activity
+    const events = [
+      'keydown',
+      'mousedown',
+      'mousemove',
+      'scroll',
+      'touchstart',
+      'focus',
+      'input',
+      'paste',
+      'click',
+    ];
+    events.forEach((evt) => window.addEventListener(evt, resetIdle, true));
+    resetIdle();
+    return () => {
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+      events.forEach((evt) => window.removeEventListener(evt, resetIdle, true));
+    };
+  }, [isMobile]);
 
   useEffect(() => {
     const checkWidth = () => {
@@ -46,9 +90,53 @@ export default function Terminal() {
     checkWidth();
     setOutput([window.innerWidth < 768 ? mobileWelcomeMessage : desktopWelcomeMessage]);
 
+    // Load speed demon badge from localStorage if it exists
+    try {
+      const savedSpeedDemon = localStorage.getItem(SPEED_DEMON_KEY);
+      if (savedSpeedDemon) {
+        setSpeedDemonWpm(parseInt(savedSpeedDemon, 10));
+      }
+    } catch (e) {
+      console.error('Error loading speed demon badge from localStorage', e);
+    }
+
     window.addEventListener('resize', checkWidth);
     return () => window.removeEventListener('resize', checkWidth);
   }, []);
+
+  // Track high WPM and check for speed demon achievement
+  useEffect(() => {
+    // Only track when actively typing
+    if (wpm > 0) {
+      // Start tracking typing duration
+      if (typingStartTimeRef.current === null) {
+        typingStartTimeRef.current = Date.now();
+      }
+
+      // Track highest WPM
+      if (wpm > highWpmRef.current) {
+        highWpmRef.current = wpm;
+      }
+
+      // Check if typing duration exceeds minimum and WPM exceeds threshold
+      const typingDuration = Date.now() - (typingStartTimeRef.current || 0);
+      if (typingDuration >= MIN_TYPING_DURATION && highWpmRef.current >= SPEED_DEMON_THRESHOLD) {
+        // Award speed demon badge if it's a new record
+        if (!speedDemonWpm || highWpmRef.current > speedDemonWpm) {
+          setSpeedDemonWpm(highWpmRef.current);
+          try {
+            localStorage.setItem(SPEED_DEMON_KEY, highWpmRef.current.toString());
+          } catch (e) {
+            console.error('Error saving speed demon badge to localStorage', e);
+          }
+        }
+      }
+    } else {
+      // Reset tracking when not typing
+      typingStartTimeRef.current = null;
+      highWpmRef.current = 0;
+    }
+  }, [wpm, speedDemonWpm]);
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -155,7 +243,23 @@ export default function Terminal() {
             return;
           }
           e.preventDefault();
-          setOutput((prev) => [...prev, `$ ${input}`, '^C']);
+          setOutput((prev) => {
+            // Check if last output is a matrix-output
+            if (prev.length > 0) {
+              try {
+                const lastIdx = prev.length - 1;
+                const last = prev[lastIdx];
+                const parsed = JSON.parse(last);
+                if (parsed.type === 'matrix-output' && !parsed.cancelled) {
+                  parsed.cancelled = true;
+                  const updated = [...prev];
+                  updated[lastIdx] = JSON.stringify(parsed);
+                  return [...updated, `$ ${input}`, '^C'];
+                }
+              } catch {}
+            }
+            return [...prev, `$ ${input}`, '^C'];
+          });
           setInput('');
           break;
         case 'v':
@@ -194,136 +298,189 @@ export default function Terminal() {
   }, []);
 
   useEffect(() => {
-    if (outputRef.current) {
+    if (idle && outputRef.current) {
+      outputRef.current.scrollTop = 0;
+    } else if (outputRef.current) {
       outputRef.current.scrollTop = outputRef.current.scrollHeight;
     }
-  }, [output]);
+  }, [output, idle]);
 
   useEffect(() => {
     // Focus input on mount
     inputRef.current?.focus();
   }, []);
 
+  const handleMeltdownComplete = useCallback((index: number) => {
+    setOutput((prev) =>
+      prev.map((entry, i) => {
+        if (i !== index) return entry;
+        try {
+          const data = JSON.parse(entry);
+          if (data.type === 'system-meltdown-output' && !data.static) {
+            return JSON.stringify({ ...data, static: true });
+          }
+        } catch {}
+        return entry;
+      })
+    );
+  }, []);
+
   return (
-    <>
-      <Card className="w-full max-w-3xl bg-zinc-900 text-zinc-100 font-mono shadow-lg border border-zinc-700 overflow-hidden">
-        <CardContent className="p-0">
-          <div className="flex items-center justify-between bg-zinc-800 px-4 py-2 border-b border-zinc-700 rounded-t-lg">
-            <div className="flex space-x-2">
-              <div className="w-3 h-3 rounded-full bg-red-500"></div>
-              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+    <TerminalDragMotion isMobile={isMobile}>
+      {(dragControls) => (
+        <Card
+          className={`${
+            isMobile ? 'w-[90vw] max-w-[480px] mx-auto' : 'w-full max-w-3xl min-w-[718px]'
+          } bg-zinc-900 text-zinc-100 font-mono shadow-lg border border-zinc-700 overflow-hidden`}
+        >
+          <CardContent className="p-0">
+            <div
+              className="flex items-center justify-between bg-zinc-800 px-4 py-2 border-b border-zinc-700 rounded-t-lg cursor-move select-none"
+              onPointerDown={(e) => {
+                // Only left click
+                if (e.button === 0 && dragControls && dragControls.start) {
+                  dragControls.start(e);
+                }
+              }}
+              style={{ userSelect: 'none' }}
+            >
+              <div className="flex space-x-2">
+                <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              </div>
+              <div className={`flex items-center gap-2 ${isMobile ? 'mt-2 mb-2' : ''}`}>
+                {!isMobile ? (
+                  <TooltipProvider>
+                    {speedDemonWpm && (
+                      <div className="mr-2">
+                        <SpeedDemonBadge wpm={speedDemonWpm} isMobile={isMobile} />
+                      </div>
+                    )}
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Link
+                          href="/resume"
+                          tabIndex={0}
+                          className="p-1.5 text-zinc-400 hover:text-zinc-200 transition-colors rounded-md hover:bg-zinc-700/50"
+                          aria-label="View Resume"
+                        >
+                          <ExternalLinkIcon className="w-4 h-4" />
+                        </Link>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>View Resume</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={handleDownload}
+                          tabIndex={0}
+                          className="p-1.5 text-zinc-400 hover:text-zinc-200 transition-colors rounded-md hover:bg-zinc-700/50"
+                          aria-label="Download Resume"
+                        >
+                          <DownloadIcon className="w-4 h-4" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Download Resume</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                ) : (
+                  <>
+                    {speedDemonWpm && (
+                      <div className="mr-2">
+                        <SpeedDemonBadge wpm={speedDemonWpm} isMobile={isMobile} />
+                      </div>
+                    )}
+                    <Link
+                      href="/resume"
+                      tabIndex={0}
+                      className="p-3 text-zinc-400 hover:text-zinc-200 transition-colors rounded-lg hover:bg-zinc-700/50 min-w-[48px] min-h-[48px] flex items-center justify-center"
+                      aria-label="View Resume"
+                    >
+                      <ExternalLinkIcon className="w-7 h-7" />
+                    </Link>
+                    <button
+                      onClick={handleDownload}
+                      tabIndex={0}
+                      className="p-3 text-zinc-400 hover:text-zinc-200 transition-colors rounded-lg hover:bg-zinc-700/50 min-w-[48px] min-h-[48px] flex items-center justify-center"
+                      aria-label="Download Resume"
+                    >
+                      <DownloadIcon className="w-7 h-7" />
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
-            <div className={`flex items-center gap-2 ${isMobile ? 'mt-2 mb-2' : ''}`}>
-              {!isMobile ? (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Link
-                        href="/resume"
-                        tabIndex={0}
-                        className="p-1.5 text-zinc-400 hover:text-zinc-200 transition-colors rounded-md hover:bg-zinc-700/50"
-                        aria-label="View Resume"
-                      >
-                        <ExternalLinkIcon className="w-4 h-4" />
-                      </Link>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>View Resume</p>
-                    </TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        onClick={handleDownload}
-                        tabIndex={0}
-                        className="p-1.5 text-zinc-400 hover:text-zinc-200 transition-colors rounded-md hover:bg-zinc-700/50"
-                        aria-label="Download Resume"
-                      >
-                        <DownloadIcon className="w-4 h-4" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Download Resume</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+            <div
+              className="flex flex-col h-[60vh] min-h-[60vh] w-full min-w-full p-4 overflow-auto whitespace-pre-wrap relative"
+              ref={outputRef}
+            >
+              {!isMobile && idle ? (
+                <IdleSignature />
               ) : (
-                <>
-                  <Link
-                    href="/resume"
-                    tabIndex={0}
-                    className="p-3 text-zinc-400 hover:text-zinc-200 transition-colors rounded-lg hover:bg-zinc-700/50 min-w-[48px] min-h-[48px] flex items-center justify-center"
-                    aria-label="View Resume"
-                  >
-                    <ExternalLinkIcon className="w-7 h-7" />
-                  </Link>
-                  <button
-                    onClick={handleDownload}
-                    tabIndex={0}
-                    className="p-3 text-zinc-400 hover:text-zinc-200 transition-colors rounded-lg hover:bg-zinc-700/50 min-w-[48px] min-h-[48px] flex items-center justify-center"
-                    aria-label="Download Resume"
-                  >
-                    <DownloadIcon className="w-7 h-7" />
-                  </button>
-                </>
+                output.map((entry, i) => (
+                  <TerminalOutput
+                    key={i}
+                    output={entry}
+                    index={i}
+                    onMeltdownComplete={handleMeltdownComplete}
+                  />
+                ))
               )}
             </div>
-          </div>
-          <div
-            className="flex flex-col h-[60vh] p-4 overflow-auto whitespace-pre-wrap"
-            ref={outputRef}
-          >
-            <TerminalHistory output={output} />
-          </div>
-          <form onSubmit={handleInputSubmit} className="border-t border-zinc-700">
-            <div className="flex flex-col">
-              <div className={`flex p-2 relative group ${isMobile ? 'min-h-[56px]' : ''}`}>
-                <span
-                  className={
-                    `text-zinc-500 mr-2 shrink-0 group-focus-within:text-blue-400 transition-colors ` +
-                    (isMobile ? 'text-lg pt-2' : '')
-                  }
-                  style={isMobile ? { minWidth: 32 } : {}}
-                >
-                  $
-                </span>
-                <div className={`relative flex-grow ${isMobile ? 'pt-1 pb-1' : ''}`}>
-                  {!hasUsedTab && !isMobile && (
-                    <span
-                      className={
-                        `absolute right-2 top-0 text-xs text-zinc-600 pointer-events-none animate-pulse ` +
-                        (isMobile ? 'top-2 right-3' : '')
-                      }
-                    >
-                      Press Tab to autocomplete
-                    </span>
-                  )}
-                  <TerminalInput
-                    input={input}
-                    setInput={setInput}
-                    handleKeyDown={handleKeyDown}
-                    handleInputChange={handleInputChange}
-                    handlePaste={handlePaste}
-                    inputRef={inputRef}
-                    isMobile={isMobile}
-                  />
+            <form onSubmit={handleInputSubmit} className="border-t border-zinc-700">
+              <div className="flex flex-col">
+                <div className={`flex p-2 relative group ${isMobile ? 'min-h-[56px]' : ''}`}>
+                  <span
+                    className={
+                      `text-zinc-500 mr-2 shrink-0 group-focus-within:text-blue-400 transition-colors ` +
+                      (isMobile ? 'text-lg pt-2' : '')
+                    }
+                    style={isMobile ? { minWidth: 32 } : {}}
+                  >
+                    $
+                  </span>
+                  <div className={`relative flex-grow ${isMobile ? 'pt-1 pb-1' : ''}`}>
+                    {!hasUsedTab && !isMobile && (
+                      <span
+                        className={
+                          `absolute right-2 top-0 text-xs text-zinc-600 pointer-events-none animate-pulse ` +
+                          (isMobile ? 'top-2 right-3' : '')
+                        }
+                      >
+                        Press Tab to autocomplete
+                      </span>
+                    )}
+                    <TerminalInput
+                      input={input}
+                      setInput={setInput}
+                      handleKeyDown={handleKeyDown}
+                      handleInputChange={handleInputChange}
+                      handlePaste={handlePaste}
+                      inputRef={inputRef}
+                      isMobile={isMobile}
+                    />
+                  </div>
                 </div>
+                <StatusLine
+                  currentDirectory={vfs.currentPath}
+                  validCommandCount={commandHistory.length}
+                  isMobile={isMobile}
+                  onHomeDirectory={() => {
+                    setVfs((prev) => ({ ...prev, currentPath: [] }));
+                  }}
+                  onRefresh={handleRefresh}
+                  wpm={wpm}
+                />
               </div>
-              <StatusLine
-                currentDirectory={vfs.currentPath}
-                validCommandCount={commandHistory.length}
-                isMobile={isMobile}
-                onHomeDirectory={() => {
-                  setVfs((prev) => ({ ...prev, currentPath: [] }));
-                }}
-                onRefresh={handleRefresh}
-                wpm={wpm}
-              />
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-    </>
+            </form>
+          </CardContent>
+        </Card>
+      )}
+    </TerminalDragMotion>
   );
 }

@@ -35,7 +35,26 @@ export interface TextOutput extends BaseOutput {
   content: string;
 }
 
+// Coffee output type (for the secret coffee command)
+export interface CoffeeOutputType extends BaseOutput {
+  type: 'coffee-output';
+  duration?: number;
+}
+
+// System Meltdown output type (for rm -rf / easter egg)
+export interface SystemMeltdownOutput extends BaseOutput {
+  static: any;
+  type: 'system-meltdown-output';
+}
+
 // Union type of all possible outputs
+// Matrix output type (for matrix command)
+export interface MatrixOutput extends BaseOutput {
+  type: 'matrix-output';
+  lines?: number;
+  columns?: number;
+  cancelled?: boolean;
+}
 // List output type (for multi-line text files)
 export interface ListOutput extends BaseOutput {
   type: 'list-output';
@@ -54,4 +73,7 @@ export type TerminalOutputType =
   | ListOutput
   | CommandOutput
   | TextOutput
+  | MatrixOutput
+  | CoffeeOutputType
+  | SystemMeltdownOutput
   | GameOutput;
