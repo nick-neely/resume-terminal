@@ -61,7 +61,7 @@ export const SystemMeltdownOutput: React.FC = () => {
 
     // Use a base delay and add some randomness
     const baseDelay = 250;
-    const randomDelay = getRandomDelay(50, 350); 
+    const randomDelay = getRandomDelay(50, 350);
     let delay = baseDelay + randomDelay;
 
     // Special case: much longer delay before the BSOD
@@ -80,8 +80,6 @@ export const SystemMeltdownOutput: React.FC = () => {
   const handleDismissBSOD = useCallback(() => {
     setShowBSOD(false);
     setBsodDismissed(true);
-    setLines(meltdownLines);
-    setCurrentLine(meltdownLines.length);
   }, []);
 
   useEffect(() => {

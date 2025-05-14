@@ -4,6 +4,7 @@ import { GrepOutput as GrepOutputComponent } from './GrepOutput';
 import { MatrixOutput } from './MatrixOutput';
 import { CoffeeOutput } from './CoffeeOutput';
 import { SystemMeltdownOutput } from './SystemMeltdownOutput';
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
 interface TerminalOutputProps {
@@ -12,6 +13,8 @@ interface TerminalOutputProps {
 }
 
 export const TerminalOutput: React.FC<TerminalOutputProps> = ({ output, index }) => {
+  // For meltdown sequence, control local rendering so it doesn't rerun automatically
+  const [meltdownActive, setMeltdownActive] = useState(true);
   // Try to parse as structured output
   try {
     const data = JSON.parse(output) as TerminalOutputType;
