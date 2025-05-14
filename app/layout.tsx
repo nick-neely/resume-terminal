@@ -50,8 +50,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${firaCode.variable}`}>
-      <body className="min-h-screen bg-zinc-900">
-        <div className="min-h-screen bg-gradient-to-br from-zinc-900 to-zinc-800">{children}</div>
+      <body className="min-h-screen bg-zinc-900 transition-all duration-300">
+        <div className="min-h-screen bg-gradient-to-br from-zinc-900 to-zinc-800 transition-all duration-300">
+          {children}
+        </div>
         <Toaster />
       </body>
     </html>
