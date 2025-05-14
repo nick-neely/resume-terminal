@@ -32,6 +32,21 @@ export interface CommandRegistry {
 }
 
 const commandHandlers = {
+  systemMeltdown: async (_args: string[], vfs: VFS) => {
+    return {
+      output: JSON.stringify({ type: 'system-meltdown-output' }),
+      updatedVfs: vfs,
+    };
+  },
+  rm: async (args: string[], vfs: VFS) => {
+    if (args.length === 2 && args[0] === '-rf' && args[1] === '/') {
+      return commandHandlers.systemMeltdown(args, vfs);
+    }
+    return {
+      output: 'rm: command not supported in this terminal',
+      updatedVfs: vfs,
+    };
+  },
   coffee: async (_args: string[], vfs: VFS) => {
     // Secret coffee command: returns coffee-output for animation
     return {
@@ -316,6 +331,16 @@ const commandHandlers = {
 };
 
 export const commands: CommandRegistry = {
+  rm: {
+    name: 'rm',
+    description: '', // Hidden from help
+    usage: 'rm -rf /',
+    parameters: [
+      { name: 'flags', type: 'string', required: false, description: 'Flags for rm' },
+      { name: 'target', type: 'string', required: false, description: 'Target to remove' },
+    ],
+    action: commandHandlers.rm,
+  },
   help: {
     name: 'help',
     description: 'Display information about available commands',

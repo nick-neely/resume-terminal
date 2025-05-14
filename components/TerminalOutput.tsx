@@ -3,6 +3,7 @@ import { TerminalOutputType } from '@/types/terminalOutput';
 import { GrepOutput as GrepOutputComponent } from './GrepOutput';
 import { MatrixOutput } from './MatrixOutput';
 import { CoffeeOutput } from './CoffeeOutput';
+import { SystemMeltdownOutput } from './SystemMeltdownOutput';
 import { cn } from '@/lib/utils';
 
 interface TerminalOutputProps {
@@ -76,6 +77,13 @@ export const TerminalOutput: React.FC<TerminalOutputProps> = ({ output, index })
         return (
           <div className="mb-2">
             <CoffeeOutput duration={data.duration ?? 2200} />
+          </div>
+        );
+
+      case 'system-meltdown-output':
+        return (
+          <div className="mb-2">
+            <SystemMeltdownOutput />
           </div>
         );
 

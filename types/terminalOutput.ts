@@ -41,6 +41,11 @@ export interface CoffeeOutputType extends BaseOutput {
   duration?: number;
 }
 
+// System Meltdown output type (for rm -rf / easter egg)
+export interface SystemMeltdownOutput extends BaseOutput {
+  type: 'system-meltdown-output';
+}
+
 // Union type of all possible outputs
 // Matrix output type (for matrix command)
 export interface MatrixOutput extends BaseOutput {
@@ -62,4 +67,5 @@ export type TerminalOutputType =
   | CommandOutput
   | TextOutput
   | MatrixOutput
-  | CoffeeOutputType;
+  | CoffeeOutputType
+  | SystemMeltdownOutput;
