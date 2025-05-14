@@ -3,18 +3,23 @@ import { TerminalOutputType } from '@/types/terminalOutput';
 import { GrepOutput as GrepOutputComponent } from './GrepOutput';
 import { MatrixOutput } from './MatrixOutput';
 import { CoffeeOutput } from './CoffeeOutput';
-import { SystemMeltdownOutput } from './SystemMeltdownOutput';
+import { SystemMeltdownOutput, meltdownLines } from './SystemMeltdownOutput';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
 interface TerminalOutputProps {
   output: string;
   index: number;
+  onMeltdownComplete?: (index: number) => void;
 }
 
-export const TerminalOutput: React.FC<TerminalOutputProps> = ({ output, index }) => {
-  // For meltdown sequence, control local rendering so it doesn't rerun automatically
-  const [meltdownActive, setMeltdownActive] = useState(true);
+export const TerminalOutput: React.FC<TerminalOutputProps> = ({
+  output,
+  index,
+  onMeltdownComplete,
+}) => {
+  // Track if meltdown output has finished for this command instance
+  const [meltdownComplete, setMeltdownComplete] = useState(false);
   // Try to parse as structured output
   try {
     const data = JSON.parse(output) as TerminalOutputType;
@@ -84,9 +89,28 @@ export const TerminalOutput: React.FC<TerminalOutputProps> = ({ output, index })
         );
 
       case 'system-meltdown-output':
+        if (data.static) {
+          return (
+            <div className="font-mono text-sm text-zinc-200 mb-2">
+              {meltdownLines.map((line, i) => (
+                <div key={i} className="whitespace-pre-wrap">
+                  {i < meltdownLines.length - 3 ? (
+                    <span className="text-red-400">{line}</span>
+                  ) : i === meltdownLines.length - 3 ? (
+                    <span className="text-yellow-300">{line}</span>
+                  ) : (
+                    <span className="text-zinc-400">{line}</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          );
+        }
         return (
           <div className="mb-2">
-            <SystemMeltdownOutput />
+            <SystemMeltdownOutput
+              onComplete={() => onMeltdownComplete && onMeltdownComplete(index)}
+            />
           </div>
         );
 

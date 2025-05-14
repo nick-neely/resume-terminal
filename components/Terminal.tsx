@@ -22,6 +22,7 @@ import { useLiveWPM } from '../utils/wpmUtils';
 import { StatusLine } from './StatusLine';
 import TerminalHistory from './TerminalHistory';
 import TerminalInput from './TerminalInput';
+import { TerminalOutput } from './TerminalOutput';
 import { SpeedDemonBadge } from './SpeedDemonBadge';
 import { TerminalDragMotion } from './TerminalDragMotion';
 import { IdleSignature } from './IdleSignature';
@@ -309,6 +310,21 @@ export default function Terminal() {
     inputRef.current?.focus();
   }, []);
 
+  const handleMeltdownComplete = useCallback((index: number) => {
+    setOutput((prev) =>
+      prev.map((entry, i) => {
+        if (i !== index) return entry;
+        try {
+          const data = JSON.parse(entry);
+          if (data.type === 'system-meltdown-output' && !data.static) {
+            return JSON.stringify({ ...data, static: true });
+          }
+        } catch {}
+        return entry;
+      })
+    );
+  }, []);
+
   return (
     <TerminalDragMotion isMobile={isMobile}>
       {(dragControls) => (
@@ -399,7 +415,16 @@ export default function Terminal() {
               className="flex flex-col h-[60vh] min-h-[60vh] w-full min-w-full p-4 overflow-auto whitespace-pre-wrap relative"
               ref={outputRef}
             >
-              {!isMobile && idle ? <IdleSignature /> : <TerminalHistory output={output} />}
+              {!isMobile && idle ? <IdleSignature /> : (
+                output.map((entry, i) => (
+                  <TerminalOutput
+                    key={i}
+                    output={entry}
+                    index={i}
+                    onMeltdownComplete={handleMeltdownComplete}
+                  />
+                ))
+              )}
             </div>
             <form onSubmit={handleInputSubmit} className="border-t border-zinc-700">
               <div className="flex flex-col">

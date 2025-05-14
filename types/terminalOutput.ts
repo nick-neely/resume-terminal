@@ -43,6 +43,7 @@ export interface CoffeeOutputType extends BaseOutput {
 
 // System Meltdown output type (for rm -rf / easter egg)
 export interface SystemMeltdownOutput extends BaseOutput {
+  static: any;
   type: 'system-meltdown-output';
 }
 

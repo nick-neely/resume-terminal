@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { BSODOverlay } from './BSODOverlay';
 
-const meltdownLines = [
+export const meltdownLines = [
   '/bin/bash: line 1: warning: removing root filesystem',
   'deleting /bin/bash',
   'deleting /etc/passwd',
@@ -30,7 +30,12 @@ const getRandomDelay = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-export const SystemMeltdownOutput: React.FC = () => {
+interface SystemMeltdownOutputProps {
+  isStatic?: boolean;
+  onComplete?: () => void;
+}
+
+export const SystemMeltdownOutput: React.FC<SystemMeltdownOutputProps> = ({ isStatic = false, onComplete }) => {
   const [lines, setLines] = useState<string[]>([]);
   const [currentLine, setCurrentLine] = useState(0);
   const [showBSOD, setShowBSOD] = useState(false);
@@ -43,6 +48,17 @@ export const SystemMeltdownOutput: React.FC = () => {
       endRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [lines]);
+
+  // If static, show all lines instantly, no animation, no BSOD
+  useEffect(() => {
+    if (isStatic) {
+      setLines(meltdownLines);
+      setCurrentLine(meltdownLines.length);
+      setShowBSOD(false);
+      setBsodDismissed(true);
+      return;
+    }
+  }, [isStatic]);
 
   // Process lines with random delays
   useEffect(() => {
@@ -80,7 +96,8 @@ export const SystemMeltdownOutput: React.FC = () => {
   const handleDismissBSOD = useCallback(() => {
     setShowBSOD(false);
     setBsodDismissed(true);
-  }, []);
+    if (onComplete) onComplete();
+  }, [onComplete]);
 
   useEffect(() => {
     if (!showBSOD) return;
