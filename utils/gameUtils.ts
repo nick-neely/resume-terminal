@@ -1,3 +1,4 @@
+// TIC TAC TOE GAME UTILITIES
 export type TicTacToeBoard = (string | null)[];
 
 // Check if there's a winner in TicTacToe
@@ -72,4 +73,152 @@ const findTicTacToeWinningMove = (board: TicTacToeBoard, symbol: string): number
   }
   
   return -1;
+};
+
+// SNAKE GAME UTILITIES
+export type SnakeDirection = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT';
+
+// High Score Constants
+export const SNAKE_HIGH_SCORE_KEY = 'snake_high_score';
+
+// Get the current high score from localStorage
+export const getSnakeHighScore = (): number => {
+  const score = localStorage.getItem(SNAKE_HIGH_SCORE_KEY);
+  return score ? parseInt(score, 10) : 0;
+};
+
+// Update the high score in localStorage if the new score is higher
+export const updateSnakeHighScore = (score: number): void => {
+  const currentHighScore = getSnakeHighScore();
+  if (score > currentHighScore) {
+    localStorage.setItem(SNAKE_HIGH_SCORE_KEY, score.toString());
+  }
+};
+
+export type SnakeSegment = {
+  x: number;
+  y: number;
+};
+
+export type SnakeGameState = {
+  snake: SnakeSegment[];
+  food: SnakeSegment | null;
+  direction: SnakeDirection;
+  gridSize: { width: number; height: number };
+};
+
+// Initialize a new snake game state
+export const initSnakeGameState = (width: number, height: number): SnakeGameState => {
+  // Start with a 3-segment snake in the middle of the grid
+  const centerX = Math.floor(width / 2);
+  const centerY = Math.floor(height / 2);
+  
+  return {
+    snake: [
+      { x: centerX, y: centerY },     // Head
+      { x: centerX - 1, y: centerY },  // Body
+      { x: centerX - 2, y: centerY },  // Tail
+    ],
+    food: generateSnakeFood(width, height, [{ x: centerX, y: centerY }, { x: centerX - 1, y: centerY }, { x: centerX - 2, y: centerY }]),
+    direction: 'RIGHT',
+    gridSize: { width, height }
+  };
+};
+
+// Generate food at a random position (not on the snake)
+export const generateSnakeFood = (width: number, height: number, snake: SnakeSegment[]): SnakeSegment => {
+  // Create an array of all possible positions
+  const allPositions: SnakeSegment[] = [];
+  for (let x = 0; x < width; x++) {
+    for (let y = 0; y < height; y++) {
+      allPositions.push({ x, y });
+    }
+  }
+  
+  // Filter out positions occupied by the snake
+  const availablePositions = allPositions.filter(pos => 
+    !snake.some(segment => segment.x === pos.x && segment.y === pos.y)
+  );
+  
+  // Select a random position for food
+  return availablePositions[Math.floor(Math.random() * availablePositions.length)];
+};
+
+// Move the snake in the current direction
+export const moveSnake = (state: SnakeGameState): SnakeGameState => {
+  const { snake, direction, food, gridSize } = state;
+  const head = snake[0];
+  
+  // Calculate new head position based on direction
+  let newHead: SnakeSegment;
+  switch (direction) {
+    case 'UP':
+      newHead = { x: head.x, y: head.y - 1 };
+      break;
+    case 'DOWN':
+      newHead = { x: head.x, y: head.y + 1 };
+      break;
+    case 'LEFT':
+      newHead = { x: head.x - 1, y: head.y };
+      break;
+    case 'RIGHT':
+      newHead = { x: head.x + 1, y: head.y };
+      break;
+  }
+  
+  // Check if snake hit a wall
+  if (
+    newHead.x < 0 || 
+    newHead.x >= gridSize.width || 
+    newHead.y < 0 || 
+    newHead.y >= gridSize.height
+  ) {
+    return { ...state, snake: [] }; // Return empty snake to indicate game over
+  }
+  
+  // Check if snake hit itself
+  if (snake.some(segment => segment.x === newHead.x && segment.y === newHead.y)) {
+    return { ...state, snake: [] }; // Return empty snake to indicate game over
+  }
+  
+  // Create new snake array with new head
+  const newSnake = [newHead, ...snake];
+  
+  // Check if snake ate food
+  let newFood = food;
+  if (food && newHead.x === food.x && newHead.y === food.y) {
+    // Generate new food
+    newFood = generateSnakeFood(gridSize.width, gridSize.height, newSnake);
+  } else {
+    // Remove tail if didn't eat food
+    newSnake.pop();
+  }
+  
+  return {
+    ...state,
+    snake: newSnake,
+    food: newFood
+  };
+};
+
+// Change the snake's direction (prevent 180° turns)
+export const changeSnakeDirection = (state: SnakeGameState, newDirection: SnakeDirection): SnakeGameState => {
+  const { direction } = state;
+  
+  // Prevent 180° turns
+  if (
+    (direction === 'UP' && newDirection === 'DOWN') ||
+    (direction === 'DOWN' && newDirection === 'UP') ||
+    (direction === 'LEFT' && newDirection === 'RIGHT') ||
+    (direction === 'RIGHT' && newDirection === 'LEFT')
+  ) {
+    return state;
+  }
+  
+  return { ...state, direction: newDirection };
+};
+
+// Calculate score based on snake length
+export const getSnakeScore = (snake: SnakeSegment[]): number => {
+  return Math.max(0, snake.length - 3); // Start score from 0 (initial snake has 3 segments)
 };

@@ -9,7 +9,7 @@ interface ArcadeCabinetProps {
 
 const ArcadeCabinet: React.FC<ArcadeCabinetProps> = ({ children, title }) => {
   return (
-    <div className="relative w-full max-w-3xl mx-auto my-2">
+    <div className="relative w-full max-w-3xl mx-auto mt-0 mb-1">
       {/* Outer Cabinet with Metallic Border */}
       <div
         className="relative bg-terminal-black rounded-xl overflow-hidden
@@ -17,7 +17,7 @@ const ArcadeCabinet: React.FC<ArcadeCabinetProps> = ({ children, title }) => {
                     before:absolute before:inset-0 before:border-2 before:border-[#404040]/50 before:rounded-lg before:m-0.5"
       >
         {/* Arcade Marquee with Elaborate Styling */}
-        <div className="relative h-16 bg-gradient-to-b from-terminal-black via-[#1a1a1a] to-terminal-black overflow-hidden">
+        <div className="relative h-12 bg-gradient-to-b from-terminal-black via-[#1a1a1a] to-terminal-black overflow-hidden">
           {/* Decorative Background Patterns */}
           <div className="absolute inset-0 opacity-30">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_16px_16px,#1a1a1a_2px,transparent_4px)] bg-repeat bg-[length:24px_24px]" />
@@ -84,7 +84,7 @@ const ArcadeCabinet: React.FC<ArcadeCabinetProps> = ({ children, title }) => {
         </div>
 
         {/* Cabinet Controls with Metallic Finish */}
-        <div className="px-6 py-3 bg-gradient-to-b from-[#1a1a1a] via-terminal-black to-terminal-black border-t border-[#333]">
+        <div className="px-6 py-2 bg-gradient-to-b from-[#1a1a1a] via-terminal-black to-terminal-black border-t border-[#333]">
           <div className="flex items-center justify-center gap-12">
             {/* Enhanced Joystick */}
             <div className="relative w-12 h-12">
@@ -169,14 +169,6 @@ const ArcadeCabinet: React.FC<ArcadeCabinetProps> = ({ children, title }) => {
                 </div>
               ))}
             </div>
-          </div>
-
-          {/* Control Instructions */}
-          <div
-            className="mt-3 text-[#666] text-xs font-mono text-center tracking-wide
-                        border border-[#333] rounded px-3 py-1.5 bg-[#1a1a1a]/50"
-          >
-            Use keyboard or click to play
           </div>
         </div>
       </div>
