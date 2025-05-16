@@ -4,13 +4,7 @@ import type React from 'react';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import ArcadeCabinet from '../ArcadeCabinet';
-import {
-  LucideArrowUp,
-  LucideArrowDown,
-  LucideArrowLeft,
-  LucideArrowRight,
-
-} from 'lucide-react';
+import { LucideArrowUp, LucideArrowDown, LucideArrowLeft, LucideArrowRight } from 'lucide-react';
 import {
   type SnakeGameState,
   type SnakeDirection,
@@ -27,11 +21,11 @@ const Snake: React.FC = () => {
   const GRID_WIDTH = 20;
   const GRID_HEIGHT = 15;
   const CELL_SIZE = 18; // pixels
-  
+
   // Mobile-optimized grid size
   const MOBILE_GRID_WIDTH = 16; // Fewer columns for mobile
   const MOBILE_CELL_SIZE = 16; // Slightly smaller cells for mobile
-  
+
   // Cell inner size (slightly smaller than cell to create grid effect)
   const getCellInnerSize = (isMobile: boolean) => {
     const cellSize = isMobile ? MOBILE_CELL_SIZE : CELL_SIZE;
@@ -64,8 +58,6 @@ const Snake: React.FC = () => {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-
-
 
   // Reset game
   const resetGame = useCallback(() => {
@@ -263,7 +255,7 @@ const Snake: React.FC = () => {
         // Base cell styles - transparent background for better contrast
         let cellClass = 'bg-transparent';
         let cellStyle: React.CSSProperties = {};
-        
+
         // Calculate inner dimensions
         const innerSize = getCellInnerSize(isMobile);
 
@@ -369,24 +361,34 @@ const Snake: React.FC = () => {
             <div className="flex flex-col items-center w-full gap-0.5 px-1 pt-0.5">
               <div className="flex items-center justify-center gap-1 bg-terminal-black/50 rounded border border-terminal-green/30 px-2 py-0.5 w-fit mx-auto">
                 <span className="text-terminal-green/70 text-[10px] font-mono">SCORE</span>
-                <span className="text-base text-terminal-green font-bold tabular-nums">{score}</span>
+                <span className="text-base text-terminal-green font-bold tabular-nums">
+                  {score}
+                </span>
                 <span className="text-terminal-green/30 text-[10px]">|</span>
                 <span className="text-terminal-green/70 text-[10px] font-mono">HIGH</span>
-                <span className="text-base text-terminal-green/90 font-bold tabular-nums">{highScore}</span>
+                <span className="text-base text-terminal-green/90 font-bold tabular-nums">
+                  {highScore}
+                </span>
               </div>
-              <div className="text-terminal-green/80 font-mono text-[11px] mt-0">Lvl: {Math.floor(score / 5) + 1}</div>
+              <div className="text-terminal-green/80 font-mono text-[11px] mt-0">
+                Lvl: {Math.floor(score / 5) + 1}
+              </div>
             </div>
           ) : (
             <div className="w-full flex flex-row justify-between items-center gap-4 px-2">
               <div className="flex items-center gap-4 bg-terminal-black/50 rounded border border-terminal-green/30 px-3 py-1.5">
                 <div className="flex items-center gap-2 font-mono">
                   <span className="text-terminal-green/70 text-sm">SCORE</span>
-                  <span className="text-xl text-terminal-green font-bold tabular-nums">{score}</span>
+                  <span className="text-xl text-terminal-green font-bold tabular-nums">
+                    {score}
+                  </span>
                 </div>
                 <div className="text-terminal-green/30 text-xs">|</div>
                 <div className="flex items-center gap-2 font-mono">
                   <span className="text-terminal-green/70 text-sm">HIGH</span>
-                  <span className="text-xl text-terminal-green/90 font-bold tabular-nums">{highScore}</span>
+                  <span className="text-xl text-terminal-green/90 font-bold tabular-nums">
+                    {highScore}
+                  </span>
                 </div>
               </div>
               <div className="text-terminal-green font-mono text-right">
@@ -470,8 +472,6 @@ const Snake: React.FC = () => {
             )}
           </>
         )}
-
-
       </div>
     </ArcadeCabinet>
   );

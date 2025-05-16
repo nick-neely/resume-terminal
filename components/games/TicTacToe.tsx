@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import ArcadeCabinet from '../ArcadeCabinet';
-import { TicTacToeBoard, getTicTacToeWinner, getTicTacToeComputerMove } from '../../utils/gameUtils';
+import {
+  TicTacToeBoard,
+  getTicTacToeWinner,
+  getTicTacToeComputerMove,
+} from '../../utils/gameUtils';
 
 type Player = 'X' | 'O';
 type Board = (Player | null)[];
@@ -15,27 +19,30 @@ const TicTacToe: React.FC = () => {
   const playerSymbol = isPlayerFirst ? 'X' : 'O';
   const computerSymbol = isPlayerFirst ? 'O' : 'X';
 
-  const makeMove = useCallback((index: number, symbol: string) => {
-    if (!isGameActive || squares[index]) return;
+  const makeMove = useCallback(
+    (index: number, symbol: string) => {
+      if (!isGameActive || squares[index]) return;
 
-    const newSquares = squares.slice();
-    newSquares[index] = symbol;
-    setSquares(newSquares);
+      const newSquares = squares.slice();
+      newSquares[index] = symbol;
+      setSquares(newSquares);
 
-    const winner = getTicTacToeWinner(newSquares);
-    if (winner || newSquares.every(square => square !== null)) {
-      setIsGameActive(false);
-      if (winner) {
-        // Update score based on winner
-        setScore(prev => ({
-          player: prev.player + (winner === playerSymbol ? 1 : 0),
-          computer: prev.computer + (winner === computerSymbol ? 1 : 0)
-        }));
+      const winner = getTicTacToeWinner(newSquares);
+      if (winner || newSquares.every((square) => square !== null)) {
+        setIsGameActive(false);
+        if (winner) {
+          // Update score based on winner
+          setScore((prev) => ({
+            player: prev.player + (winner === playerSymbol ? 1 : 0),
+            computer: prev.computer + (winner === computerSymbol ? 1 : 0),
+          }));
+        }
+      } else {
+        setIsPlayerTurn(!isPlayerTurn);
       }
-    } else {
-      setIsPlayerTurn(!isPlayerTurn);
-    };
-  }, [squares, isGameActive, isPlayerTurn, playerSymbol, computerSymbol]);
+    },
+    [squares, isGameActive, isPlayerTurn, playerSymbol, computerSymbol]
+  );
 
   useEffect(() => {
     // If it's computer's turn, make a move after a short delay
@@ -71,8 +78,8 @@ const TicTacToe: React.FC = () => {
   const status = winner
     ? `${winner === playerSymbol ? 'You win!' : 'Computer wins!'}`
     : squares.every((square) => square)
-    ? 'Draw!'
-    : `${isPlayerTurn ? 'Your turn' : 'Computer thinking...'}`;
+      ? 'Draw!'
+      : `${isPlayerTurn ? 'Your turn' : 'Computer thinking...'}`;
 
   return (
     <ArcadeCabinet title="TIC TAC TOE">
@@ -83,11 +90,15 @@ const TicTacToe: React.FC = () => {
           <div className="flex items-center gap-4 bg-terminal-black/50 rounded border border-terminal-green/30 px-3 py-1.5">
             <div className="flex items-center gap-2 font-mono">
               <span className="text-terminal-green/70 text-sm">YOU</span>
-              <span className="text-xl text-terminal-green font-bold tabular-nums">{score.player}</span>
+              <span className="text-xl text-terminal-green font-bold tabular-nums">
+                {score.player}
+              </span>
             </div>
             <div className="text-terminal-green/30 text-xs">VS</div>
             <div className="flex items-center gap-2 font-mono">
-              <span className="text-xl text-terminal-green/90 font-bold tabular-nums">{score.computer}</span>
+              <span className="text-xl text-terminal-green/90 font-bold tabular-nums">
+                {score.computer}
+              </span>
               <span className="text-terminal-green/70 text-sm">CPU</span>
             </div>
           </div>
@@ -95,9 +106,7 @@ const TicTacToe: React.FC = () => {
           {/* Game Status */}
           <div className="text-terminal-green font-mono text-right">
             <div>{status}</div>
-            <div className="text-xs opacity-70">
-              Playing as {playerSymbol}
-            </div>
+            <div className="text-xs opacity-70">Playing as {playerSymbol}</div>
           </div>
         </div>
 
