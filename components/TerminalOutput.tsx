@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import TicTacToe from './games/TicTacToe';
 import Snake from './games/Snake';
+import Hangman from './games/Hangman';
 
 interface TerminalOutputProps {
   output: string;
@@ -126,9 +127,7 @@ export const TerminalOutput: React.FC<TerminalOutputProps> = ({
           case 'snake':
             return <Snake />;
           case 'hangman':
-            return (
-              <div className="mb-2 text-zinc-200">Game &apos;{data.game}&apos; coming soon!</div>
-            );
+            return <Hangman />;
           default:
             return <div className="mb-2 text-zinc-200">Unknown game type</div>;
         }

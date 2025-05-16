@@ -220,5 +220,123 @@ export const changeSnakeDirection = (state: SnakeGameState, newDirection: SnakeD
 
 // Calculate score based on snake length
 export const getSnakeScore = (snake: SnakeSegment[]): number => {
-  return Math.max(0, snake.length - 3); // Start score from 0 (initial snake has 3 segments)
+  return snake.length - 3; // Initial snake has 3 segments
 };
+
+// HANGMAN GAME UTILITIES
+export const HANGMAN_HIGH_SCORE_KEY = 'hangman_high_score';
+
+// Hangman Game types
+export type HangmanGameState = {
+  word: string;          // The word to guess
+  maskedWord: string;    // The word with _ for unguessed letters
+  guessedLetters: string[]; // Letters that have been guessed
+  wrongGuesses: number;  // Number of incorrect guesses
+  maxWrongGuesses: number; // Max number of wrong guesses allowed
+  gameStatus: 'playing' | 'won' | 'lost'; // Current game status
+};
+
+// List of words for hangman game (terminal/programming themed)
+export const hangmanWordList = [
+  'terminal', 'command', 'function', 'variable', 'algorithm',
+  'browser', 'compiler', 'keyboard', 'interface', 'network',
+  'database', 'client', 'server', 'website', 'protocol',
+  'response', 'request', 'component', 'module', 'library',
+  'framework', 'javascript', 'typescript', 'react', 'node',
+  'frontend', 'backend', 'fullstack', 'developer', 'engineer',
+  'syntax', 'memory', 'binary', 'boolean', 'integer',
+  'string', 'array', 'object', 'class', 'method'
+];
+
+// Get the current high score from localStorage
+export const getHangmanHighScore = (): number => {
+  const score = localStorage.getItem(HANGMAN_HIGH_SCORE_KEY);
+  return score ? parseInt(score, 10) : 0;
+};
+
+// Update the high score in localStorage if the new score is higher
+export const updateHangmanHighScore = (score: number): void => {
+  const currentHighScore = getHangmanHighScore();
+  if (score > currentHighScore) {
+    localStorage.setItem(HANGMAN_HIGH_SCORE_KEY, score.toString());
+  }
+};
+
+// Calculate score for hangman (more points for words with fewer wrong guesses)
+export const calculateHangmanScore = (state: HangmanGameState): number => {
+  if (state.gameStatus !== 'won') return 0;
+  
+  // Base points for winning
+  const basePoints = 100;
+  
+  // Bonus for using fewer wrong guesses (percentage of remaining guesses)
+  const wrongGuessRatio = state.wrongGuesses / state.maxWrongGuesses;
+  const wrongGuessPenalty = Math.round(50 * wrongGuessRatio);
+  
+  // Bonus for word length
+  const wordLengthBonus = state.word.length * 5;
+  
+  return basePoints + wordLengthBonus - wrongGuessPenalty;
+};
+
+// Initialize a new hangman game
+export const initHangmanGame = (): HangmanGameState => {
+  // Select a random word from the word list
+  const word = hangmanWordList[Math.floor(Math.random() * hangmanWordList.length)].toUpperCase();
+  
+  return {
+    word,
+    maskedWord: '_'.repeat(word.length),
+    guessedLetters: [],
+    wrongGuesses: 0,
+    maxWrongGuesses: 6,
+    gameStatus: 'playing'
+  };
+};
+
+// Process a letter guess, update maskedWord and game status
+export const processHangmanGuess = (state: HangmanGameState, letter: string): HangmanGameState => {
+  // Uppercase for consistency
+  const upperLetter = letter.toUpperCase();
+  
+  // If already guessed or game over, return current state
+  if (state.guessedLetters.includes(upperLetter) || state.gameStatus !== 'playing') {
+    return state;
+  }
+  
+  // Add letter to guessed letters
+  const newGuessedLetters = [...state.guessedLetters, upperLetter];
+  
+  // Check if letter is in the word
+  const isCorrectGuess = state.word.includes(upperLetter);
+  
+  // Update wrong guesses if needed
+  const newWrongGuesses = isCorrectGuess ? state.wrongGuesses : state.wrongGuesses + 1;
+  
+  // Update masked word to reveal correctly guessed letters
+  let newMaskedWord = '';
+  for (let i = 0; i < state.word.length; i++) {
+    if (newGuessedLetters.includes(state.word[i])) {
+      newMaskedWord += state.word[i];
+    } else {
+      newMaskedWord += '_';
+    }
+  }
+  
+  // Determine game status
+  let newGameStatus: 'playing' | 'won' | 'lost' = state.gameStatus;
+  if (newMaskedWord === state.word) {
+    newGameStatus = 'won';
+  } else if (newWrongGuesses >= state.maxWrongGuesses) {
+    newGameStatus = 'lost';
+  }
+  
+  return {
+    ...state,
+    guessedLetters: newGuessedLetters,
+    wrongGuesses: newWrongGuesses,
+    maskedWord: newMaskedWord,
+    gameStatus: newGameStatus
+  };
+};
+
