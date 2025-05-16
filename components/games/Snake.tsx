@@ -27,6 +27,16 @@ const Snake: React.FC = () => {
   const GRID_WIDTH = 20;
   const GRID_HEIGHT = 15;
   const CELL_SIZE = 18; // pixels
+  
+  // Mobile-optimized grid size
+  const MOBILE_GRID_WIDTH = 16; // Fewer columns for mobile
+  const MOBILE_CELL_SIZE = 16; // Slightly smaller cells for mobile
+  
+  // Cell inner size (slightly smaller than cell to create grid effect)
+  const getCellInnerSize = (isMobile: boolean) => {
+    const cellSize = isMobile ? MOBILE_CELL_SIZE : CELL_SIZE;
+    return cellSize - 1; // 1px smaller for grid line effect
+  };
 
   // Game speed (milliseconds) - higher number = slower speed
   const [gameSpeed, setGameSpeed] = useState(250); // Starting slower for better player experience
@@ -55,13 +65,24 @@ const Snake: React.FC = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+
+
   // Reset game
   const resetGame = useCallback(() => {
-    setGameState(initSnakeGameState(GRID_WIDTH, GRID_HEIGHT));
+    setGameState(initSnakeGameState(isMobile ? MOBILE_GRID_WIDTH : GRID_WIDTH, GRID_HEIGHT));
     setIsGameActive(true);
     setScore(0);
     setGameSpeed(250);
-  }, []);
+    // Focus on the game grid
+    if (gameGridRef.current) {
+      gameGridRef.current.focus();
+    }
+  }, [isMobile]);
+
+  // Reset game when mobile state changes to adjust grid size
+  useEffect(() => {
+    resetGame();
+  }, [isMobile, resetGame]);
 
   // Change snake direction (with validation)
   const changeDirection = useCallback(
@@ -235,38 +256,51 @@ const Snake: React.FC = () => {
       return snake.findIndex((segment) => segment.x === x && segment.y === y);
     };
 
-    // Create grid cells
+    // Create grid cells - use the appropriate width based on device
+    const gridWidth = isMobile ? MOBILE_GRID_WIDTH : GRID_WIDTH;
     for (let y = 0; y < GRID_HEIGHT; y++) {
-      for (let x = 0; x < GRID_WIDTH; x++) {
+      for (let x = 0; x < gridWidth; x++) {
         // Base cell styles - transparent background for better contrast
         let cellClass = 'bg-transparent';
         let cellStyle: React.CSSProperties = {};
+        
+        // Calculate inner dimensions
+        const innerSize = getCellInnerSize(isMobile);
 
         if (isSnakeHead(x, y)) {
           // Enhanced snake head with glow and better visibility
-          cellClass = 'bg-terminal-green rounded-md relative overflow-hidden';
+          cellClass = 'bg-terminal-green rounded-sm relative overflow-hidden';
           cellStyle = {
+            width: innerSize,
+            height: innerSize,
+            margin: 'auto',
             boxShadow: '0 0 8px rgba(0, 255, 128, 0.5), inset 0 0 4px rgba(255, 255, 255, 0.3)',
-            border: '2px solid rgba(0, 255, 128, 0.9)',
+            border: '1px solid rgba(0, 255, 128, 0.9)',
           };
         } else if (isSnakeSegment(x, y)) {
           // Enhanced snake body with gradient based on position
           const segmentIndex = getSegmentIndex(x, y);
           const opacity = Math.max(0.5, 1 - segmentIndex * 0.03); // Fade slightly toward tail
 
-          cellClass = 'bg-terminal-green rounded relative overflow-hidden';
+          cellClass = 'bg-terminal-green rounded-sm relative overflow-hidden';
           cellStyle = {
+            width: innerSize,
+            height: innerSize,
+            margin: 'auto',
             boxShadow: `0 0 6px rgba(0, 255, 128, ${opacity * 0.3})`,
-            border: `1.5px solid rgba(0, 255, 128, ${opacity * 0.8})`,
+            border: `1px solid rgba(0, 255, 128, ${opacity * 0.8})`,
             backgroundColor: `rgba(0, 255, 128, ${opacity * 0.8})`,
           };
         } else if (food && food.x === x && food.y === y) {
           // Enhanced food with pulsing effect
           cellClass = 'rounded-full relative overflow-hidden';
           cellStyle = {
+            width: innerSize,
+            height: innerSize,
+            margin: 'auto',
             backgroundColor: 'rgba(255, 204, 0, 0.9)',
             boxShadow: '0 0 8px rgba(255, 204, 0, 0.6), inset 0 0 4px rgba(255, 255, 255, 0.4)',
-            border: '1.5px solid rgba(255, 220, 0, 0.9)',
+            border: '1px solid rgba(255, 220, 0, 0.9)',
           };
         }
 
@@ -294,8 +328,6 @@ const Snake: React.FC = () => {
             style={{
               gridColumnStart: x + 1,
               gridRowStart: y + 1,
-              width: CELL_SIZE - 2,
-              height: CELL_SIZE - 2,
               ...cellStyle,
             }}
           />
@@ -369,21 +401,22 @@ const Snake: React.FC = () => {
         <div
           ref={gameGridRef}
           tabIndex={0}
-          className="relative grid w-full border border-terminal-green/30 bg-terminal-black/90 rounded overflow-hidden shadow-inner focus:outline-none focus:ring-1 focus:ring-terminal-green/50"
+          className="relative grid w-full border border-terminal-green/30 bg-terminal-black/90 rounded overflow-hidden shadow-inner focus:outline-none focus:ring-1 focus:ring-terminal-green/50 p-0"
           onFocus={(e) => e.currentTarget.focus()}
           style={{
-            gridTemplateColumns: `repeat(${GRID_WIDTH}, ${CELL_SIZE}px)`,
-            gridTemplateRows: `repeat(${GRID_HEIGHT}, ${CELL_SIZE}px)`,
-            maxWidth: `${GRID_WIDTH * CELL_SIZE}px`,
-            transform: isMobile ? 'scale(0.95)' : 'none', // Slightly scale down on mobile
+            gridTemplateColumns: `repeat(${isMobile ? MOBILE_GRID_WIDTH : GRID_WIDTH}, ${isMobile ? MOBILE_CELL_SIZE : CELL_SIZE}px)`,
+            gridTemplateRows: `repeat(${GRID_HEIGHT}, ${isMobile ? MOBILE_CELL_SIZE : CELL_SIZE}px)`,
+            maxWidth: `${(isMobile ? MOBILE_GRID_WIDTH : GRID_WIDTH) * (isMobile ? MOBILE_CELL_SIZE : CELL_SIZE)}px`,
             margin: '0 auto',
-            // Softer grid lines with reduced opacity and subtle green tint
+            // Grid background
             backgroundImage: `
               linear-gradient(rgba(0, 255, 128, 0.03) 1px, transparent 1px), 
               linear-gradient(90deg, rgba(0, 255, 128, 0.03) 1px, transparent 1px)
             `,
-            backgroundSize: `${CELL_SIZE}px ${CELL_SIZE}px`,
-            padding: '1px',
+            backgroundSize: `${isMobile ? MOBILE_CELL_SIZE : CELL_SIZE}px ${isMobile ? MOBILE_CELL_SIZE : CELL_SIZE}px`,
+            padding: '0',
+            gap: '0',
+            borderCollapse: 'collapse',
           }}
         >
           {renderGrid()}
