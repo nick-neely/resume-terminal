@@ -6,6 +6,9 @@ import { CoffeeOutput } from './CoffeeOutput';
 import { SystemMeltdownOutput, meltdownLines } from './SystemMeltdownOutput';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import TicTacToe from './games/TicTacToe';
+import Snake from './games/Snake';
+import Hangman from './games/Hangman';
 
 interface TerminalOutputProps {
   output: string;
@@ -116,6 +119,18 @@ export const TerminalOutput: React.FC<TerminalOutputProps> = ({
 
       case 'text-output':
         return <div className="mb-2 text-zinc-200">{data.content}</div>;
+
+      case 'game-output':
+        switch (data.game) {
+          case 'tictactoe':
+            return <TicTacToe />;
+          case 'snake':
+            return <Snake />;
+          case 'hangman':
+            return <Hangman />;
+          default:
+            return <div className="mb-2 text-zinc-200">Unknown game type</div>;
+        }
     }
   } catch {
     // Default text rendering for non-structured output

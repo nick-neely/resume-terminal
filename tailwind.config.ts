@@ -64,9 +64,20 @@ const config: Config = {
           '50%': { opacity: '0' },
           '100%': { opacity: '0' },
         },
+        'gradient-x': {
+          '0%, 100%': {
+            'background-size': '200% 100%',
+            'background-position': 'left center',
+          },
+          '50%': {
+            'background-size': '200% 100%',
+            'background-position': 'right center',
+          },
+        },
       },
       animation: {
         blink: 'blink 0.8s steps(1) infinite',
+        'gradient-x': 'gradient-x 10s ease infinite',
       },
     },
   },
