@@ -5,6 +5,13 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import ArcadeCabinet from '../ArcadeCabinet';
 import {
+  LucideArrowUp,
+  LucideArrowDown,
+  LucideArrowLeft,
+  LucideArrowRight,
+
+} from 'lucide-react';
+import {
   type SnakeGameState,
   type SnakeDirection,
   initSnakeGameState,
@@ -31,10 +38,22 @@ const Snake: React.FC = () => {
   const [isGameActive, setIsGameActive] = useState(true);
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(getSnakeHighScore());
+  const [isMobile, setIsMobile] = useState(false);
 
   // For tracking key presses and handling focus
   const lastKeyPressRef = useRef<string | null>(null);
   const gameGridRef = useRef<HTMLDivElement>(null);
+
+  // Check if device is mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Reset game
   const resetGame = useCallback(() => {
@@ -287,37 +306,66 @@ const Snake: React.FC = () => {
     return cells;
   };
 
+  // Mobile control button component
+  const ControlButton = ({
+    direction,
+    icon,
+  }: {
+    direction: SnakeDirection;
+    icon: React.ReactNode;
+  }) => (
+    <motion.button
+      className="w-12 h-12 flex items-center justify-center bg-terminal-black/70 border border-terminal-green/50 rounded-full text-terminal-green/90 shadow-inner"
+      whileTap={{ scale: 0.9, backgroundColor: 'rgba(0, 255, 128, 0.2)' }}
+      onClick={() => changeDirection(direction)}
+      aria-label={`Move ${direction.toLowerCase()}`}
+    >
+      {icon}
+    </motion.button>
+  );
+
   // Game status message
   const status = isGameActive ? '' : 'Game Over';
 
   return (
     <ArcadeCabinet title="SNAKE">
-      <div className="flex flex-col items-center gap-2">
-        {/* Header with Score and Status */}
-        <div className="w-full flex justify-between items-center gap-4 px-2">
-          {/* Score Display */}
-          <div className="flex items-center gap-4 bg-terminal-black/50 rounded border border-terminal-green/30 px-3 py-1.5">
-            <div className="flex items-center gap-2 font-mono">
-              <span className="text-terminal-green/70 text-sm">SCORE</span>
-              <span className="text-xl text-terminal-green font-bold tabular-nums">{score}</span>
+      <div className="flex flex-col items-center gap-1 sm:gap-2">
+        {/* Header with Score and Status - Mobile Optimized */}
+        {/* Mobile: Centered stacked score/high/level. Desktop: unchanged */}
+        <div className="w-full">
+          {isMobile ? (
+            <div className="flex flex-col items-center w-full gap-0.5 px-1 pt-0.5">
+              <div className="flex items-center justify-center gap-1 bg-terminal-black/50 rounded border border-terminal-green/30 px-2 py-0.5 w-fit mx-auto">
+                <span className="text-terminal-green/70 text-[10px] font-mono">SCORE</span>
+                <span className="text-base text-terminal-green font-bold tabular-nums">{score}</span>
+                <span className="text-terminal-green/30 text-[10px]">|</span>
+                <span className="text-terminal-green/70 text-[10px] font-mono">HIGH</span>
+                <span className="text-base text-terminal-green/90 font-bold tabular-nums">{highScore}</span>
+              </div>
+              <div className="text-terminal-green/80 font-mono text-[11px] mt-0">Lvl: {Math.floor(score / 5) + 1}</div>
             </div>
-            <div className="text-terminal-green/30 text-xs">|</div>
-            <div className="flex items-center gap-2 font-mono">
-              <span className="text-terminal-green/70 text-sm">HIGH</span>
-              <span className="text-xl text-terminal-green/90 font-bold tabular-nums">
-                {highScore}
-              </span>
+          ) : (
+            <div className="w-full flex flex-row justify-between items-center gap-4 px-2">
+              <div className="flex items-center gap-4 bg-terminal-black/50 rounded border border-terminal-green/30 px-3 py-1.5">
+                <div className="flex items-center gap-2 font-mono">
+                  <span className="text-terminal-green/70 text-sm">SCORE</span>
+                  <span className="text-xl text-terminal-green font-bold tabular-nums">{score}</span>
+                </div>
+                <div className="text-terminal-green/30 text-xs">|</div>
+                <div className="flex items-center gap-2 font-mono">
+                  <span className="text-terminal-green/70 text-sm">HIGH</span>
+                  <span className="text-xl text-terminal-green/90 font-bold tabular-nums">{highScore}</span>
+                </div>
+              </div>
+              <div className="text-terminal-green font-mono text-right">
+                <div>{status}</div>
+                <div className="text-xs opacity-70">Level: {Math.floor(score / 5) + 1}</div>
+              </div>
             </div>
-          </div>
-
-          {/* Game Status */}
-          <div className="text-terminal-green font-mono text-right">
-            <div>{status}</div>
-            <div className="text-xs opacity-70">Level: {Math.floor(score / 5) + 1}</div>
-          </div>
+          )}
         </div>
 
-        {/* Game Grid - Improved for better visibility */}
+        {/* Game Grid - Improved for better visibility and mobile scaling */}
         <div
           ref={gameGridRef}
           tabIndex={0}
@@ -327,6 +375,7 @@ const Snake: React.FC = () => {
             gridTemplateColumns: `repeat(${GRID_WIDTH}, ${CELL_SIZE}px)`,
             gridTemplateRows: `repeat(${GRID_HEIGHT}, ${CELL_SIZE}px)`,
             maxWidth: `${GRID_WIDTH * CELL_SIZE}px`,
+            transform: isMobile ? 'scale(0.95)' : 'none', // Slightly scale down on mobile
             margin: '0 auto',
             // Softer grid lines with reduced opacity and subtle green tint
             backgroundImage: `
@@ -341,14 +390,14 @@ const Snake: React.FC = () => {
           {!isGameActive && (
             <div className="absolute inset-0 flex items-center justify-center z-10 select-none">
               <div className="absolute inset-0 bg-terminal-black/80 backdrop-blur-sm rounded" />
-              <div className="relative flex flex-col items-center justify-center p-6">
-                <div className="text-2xl font-bold text-terminal-green drop-shadow mb-2">
+              <div className="relative flex flex-col items-center justify-center p-4 sm:p-6">
+                <div className="text-xl sm:text-2xl font-bold text-terminal-green drop-shadow mb-1 sm:mb-2">
                   GAME OVER
                 </div>
-                <div className="text-lg text-terminal-green mb-1">Score: {score}</div>
+                <div className="text-base sm:text-lg text-terminal-green mb-1">Score: {score}</div>
                 <button
                   onClick={resetGame}
-                  className="mt-2 px-4 py-2 border border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-black font-mono text-base rounded transition-colors"
+                  className="mt-2 px-3 py-1.5 sm:px-4 sm:py-2 border border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-black font-mono text-sm sm:text-base rounded transition-colors"
                 >
                   Play Again
                 </button>
@@ -356,25 +405,40 @@ const Snake: React.FC = () => {
             </div>
           )}
         </div>
+
+        {/* Mobile Controls or Desktop Instructions */}
         {isGameActive && (
-          <div className="mt-2 text-terminal-green/60 text-xs font-mono text-center opacity-70 select-none">
-            Use <span className="font-bold">arrow keys</span> or <span className="font-bold">WASD</span> to play
-          </div>
+          <>
+            {isMobile ? (
+              // Mobile touch controls
+              <div className="mt-1 w-full flex flex-col items-center">
+                {/* Top row - Up button */}
+                <div className="mb-1">
+                  <ControlButton direction="UP" icon={<LucideArrowUp size={20} />} />
+                </div>
+
+                {/* Middle row - Left and Right buttons */}
+                <div className="flex items-center justify-center gap-6">
+                  <ControlButton direction="LEFT" icon={<LucideArrowLeft size={20} />} />
+                  <ControlButton direction="RIGHT" icon={<LucideArrowRight size={20} />} />
+                </div>
+
+                {/* Bottom row - Down button */}
+                <div className="mt-1">
+                  <ControlButton direction="DOWN" icon={<LucideArrowDown size={20} />} />
+                </div>
+              </div>
+            ) : (
+              // Desktop instructions
+              <div className="mt-2 text-terminal-green/60 text-xs font-mono text-center opacity-70 select-none">
+                Use <span className="font-bold">arrow keys</span> or{' '}
+                <span className="font-bold">WASD</span> to play
+              </div>
+            )}
+          </>
         )}
 
-        {/* Game Control Buttons */}
-        <div className="flex flex-row items-center gap-3 mt-2">
-          <button
-            onClick={resetGame}
-            className="px-4 py-2 border border-terminal-green text-terminal-green 
-                     hover:bg-terminal-green hover:text-terminal-black transition-colors
-                     font-mono text-sm rounded"
-          >
-            {isGameActive ? 'Restart Game' : 'New Game'}
-          </button>
 
-
-        </div>
       </div>
     </ArcadeCabinet>
   );
