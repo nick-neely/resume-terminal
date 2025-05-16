@@ -342,9 +342,9 @@ const Hangman: React.FC = () => {
     ];
 
     return (
-      <div className="flex flex-col items-center gap-1.5 mt-4">
+      <div className="flex flex-col items-center gap-1 sm:gap-1.5 mt-3 sm:mt-4 w-full max-w-full overflow-hidden">
         {rows.map((row, rowIndex) => (
-          <div key={rowIndex} className="flex gap-1.5 justify-center">
+          <div key={rowIndex} className="flex gap-0.5 sm:gap-1.5 justify-center w-full">
             {row.map((letter) => {
               // Determine letter state
               const upperLetter = letter.toUpperCase();
@@ -357,7 +357,7 @@ const Hangman: React.FC = () => {
                   key={letter}
                   onClick={() => makeGuess(letter)}
                   disabled={isGuessed || gameState.gameStatus !== 'playing'}
-                  className={`w-8 h-9 md:w-9 md:h-10 flex items-center justify-center font-mono text-sm rounded-md
+                  className={`w-7 h-8 sm:w-8 sm:h-9 md:w-9 md:h-10 flex items-center justify-center font-mono text-xs sm:text-sm rounded-md
                     ${
                       isCorrect
                         ? 'bg-green-900/80 text-terminal-green border-terminal-green font-bold shadow-[0_0_8px_rgba(0,255,128,0.3)]'
@@ -392,47 +392,65 @@ const Hangman: React.FC = () => {
   const getStatusMessage = () => {
     const { gameStatus, word, wrongGuesses, maxWrongGuesses } = gameState;
     if (gameStatus === 'won') {
-      return `You won! The word was ${word}`;
+      return `You won!`;
     } else if (gameStatus === 'lost') {
-      return `Game over! The word was ${word}`;
+      return `Game over!`;
     }
 
     // More dynamic message based on remaining guesses
     const remaining = maxWrongGuesses - wrongGuesses;
     if (remaining <= 2) {
-      return `Warning: Only ${remaining} ${remaining === 1 ? 'guess' : 'guesses'} left!`;
+      return `${remaining} ${remaining === 1 ? 'guess' : 'guesses'} left!`;
     }
-    return `Guesses remaining: ${remaining}`;
+    return `${remaining} guesses left`;
   };
 
   return (
     <ArcadeCabinet title="HANGMAN">
       <div
         ref={containerRef}
-        className="flex flex-col items-center gap-3 relative"
+        className="flex flex-col items-center gap-2 sm:gap-3 relative w-full"
         tabIndex={0}
         aria-label="Hangman Game"
       >
-        {/* Header with Score and Status */}
-        <div className="w-full flex justify-between items-center px-2">
-          {/* Score Display */}
-          <div className="flex items-center gap-4 bg-terminal-black/60 rounded-md border border-terminal-green/30 px-3 py-1.5 shadow-inner">
-            <div className="flex items-center gap-2 font-mono">
-              <span className="text-terminal-green/70 text-sm">SCORE</span>
-              <span className="text-xl text-terminal-green font-bold tabular-nums">{score}</span>
+        {/* Mobile-optimized header with Score and Status */}
+        <div className="w-full flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0 px-1 sm:px-2">
+          {/* Score Display - Simplified for mobile */}
+          <div className="flex items-center gap-3 bg-terminal-black/60 rounded-md border border-terminal-green/30 px-2 py-1 sm:px-3 sm:py-1.5 shadow-inner w-full sm:w-auto">
+            <div className="flex items-center gap-1 font-mono">
+              <span className="text-terminal-green/70 text-xs sm:text-sm">SCORE</span>
+              <span className="text-lg sm:text-xl text-terminal-green font-bold tabular-nums">
+                {score}
+              </span>
             </div>
             <div className="text-terminal-green/30 text-xs">|</div>
-            <div className="flex items-center gap-2 font-mono">
-              <span className="text-terminal-green/70 text-sm">HIGH</span>
-              <span className="text-xl text-terminal-green/90 font-bold tabular-nums">
+            <div className="flex items-center gap-1 font-mono">
+              <span className="text-terminal-green/70 text-xs sm:text-sm">HIGH</span>
+              <span className="text-lg sm:text-xl text-terminal-green/90 font-bold tabular-nums">
                 {highScore}
+              </span>
+            </div>
+
+            {/* Mobile-only status indicator */}
+            <div className="ml-auto sm:hidden">
+              <span
+                className={`text-xs font-mono px-2 py-0.5 rounded-sm ${
+                  gameState.gameStatus === 'lost'
+                    ? 'text-red-400 bg-red-900/20 border border-red-500/30'
+                    : gameState.maxWrongGuesses - gameState.wrongGuesses <= 2 &&
+                        gameState.gameStatus === 'playing'
+                      ? 'text-yellow-400 bg-yellow-900/10 border border-yellow-500/30'
+                      : 'text-terminal-green bg-terminal-black/60 border border-terminal-green/30'
+                }`}
+              >
+                {getStatusMessage()}
               </span>
             </div>
           </div>
 
-          {/* Game Status */}
+          {/* Game Status - Desktop only */}
           <div
-            className={`text-right font-mono px-3 py-1.5 rounded-md border ${
+            className={`hidden sm:block text-right font-mono px-3 py-1.5 rounded-md border ${
               gameState.gameStatus === 'lost'
                 ? 'text-red-400 border-red-500/30 bg-red-900/20'
                 : gameState.maxWrongGuesses - gameState.wrongGuesses <= 2 &&
@@ -445,23 +463,23 @@ const Hangman: React.FC = () => {
           </div>
         </div>
 
-        {/* Game Content */}
-        <div className="flex flex-col md:flex-row w-full items-center justify-center gap-6 p-4 bg-terminal-black/80 border border-terminal-green/40 rounded-md shadow-inner">
-          {/* Hangman Drawing - Enhanced with background and container */}
-          <div className="w-40 h-40 md:w-48 md:h-48 bg-terminal-black/90 border border-terminal-green/30 rounded-md overflow-hidden">
+        {/* Game Content - Optimized for mobile */}
+        <div className="flex flex-col md:flex-row w-full items-center justify-center gap-3 sm:gap-6 p-2 sm:p-4 bg-terminal-black/80 border border-terminal-green/40 rounded-md shadow-inner">
+          {/* Hangman Drawing - Smaller on mobile */}
+          <div className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 bg-terminal-black/90 border border-terminal-green/30 rounded-md overflow-hidden">
             {renderHangman()}
           </div>
 
-          {/* Word Display - Enhanced with better styling */}
-          <div className="flex flex-col items-center gap-4 flex-1">
-            <div className="relative">
+          {/* Word Display - Responsive sizing */}
+          <div className="flex flex-col items-center gap-2 sm:gap-4 flex-1">
+            <div className="relative w-full">
               {/* Decorative elements */}
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-terminal-green/30 to-transparent"></div>
-              <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-terminal-green/30 to-transparent"></div>
+              <div className="absolute -top-2 sm:-top-3 left-1/2 transform -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-terminal-green/30 to-transparent"></div>
+              <div className="absolute -bottom-2 sm:-bottom-3 left-1/2 transform -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-terminal-green/30 to-transparent"></div>
 
-              {/* Word display */}
+              {/* Word display - Responsive text size */}
               <motion.div
-                className="text-3xl font-mono tracking-wider py-3 px-6 bg-terminal-black/60 border border-terminal-green/20 rounded-md shadow-inner"
+                className="text-xl sm:text-2xl md:text-3xl font-mono tracking-wider py-2 sm:py-3 px-3 sm:px-6 bg-terminal-black/60 border border-terminal-green/20 rounded-md shadow-inner"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 key={gameState.maskedWord} // Re-animate when word changes
@@ -472,7 +490,7 @@ const Hangman: React.FC = () => {
 
             {/* Hidden Input for Mobile - Enhanced styling */}
             <div
-              className={`relative mt-2 w-full max-w-xs ${isInputFocused ? 'mb-2' : ''}`}
+              className={`relative mt-1 sm:mt-2 w-full max-w-xs ${isInputFocused ? 'mb-1 sm:mb-2' : ''}`}
               onClick={() => inputRef.current?.focus()}
             >
               <input
@@ -488,11 +506,11 @@ const Hangman: React.FC = () => {
                 disabled={gameState.gameStatus !== 'playing'}
               />
               {isInputFocused ? (
-                <div className="text-terminal-green/80 text-sm text-center bg-terminal-black/40 border border-terminal-green/30 rounded-md py-2 px-4">
+                <div className="text-terminal-green/80 text-xs sm:text-sm text-center bg-terminal-black/40 border border-terminal-green/30 rounded-md py-1 sm:py-2 px-2 sm:px-4">
                   Type a letter to guess
                 </div>
               ) : (
-                <div className="border border-dashed border-terminal-green/40 rounded-md py-2 px-4 text-terminal-green/70 text-sm text-center bg-terminal-black/40 hover:bg-terminal-black/60 transition-colors">
+                <div className="border border-dashed border-terminal-green/40 rounded-md py-1 sm:py-2 px-2 sm:px-4 text-terminal-green/70 text-xs sm:text-sm text-center bg-terminal-black/40 hover:bg-terminal-black/60 transition-colors">
                   Tap to type a letter
                 </div>
               )}
@@ -500,7 +518,7 @@ const Hangman: React.FC = () => {
           </div>
         </div>
 
-        {/* Keyboard */}
+        {/* Keyboard - Optimized for mobile */}
         {renderKeyboard()}
 
         {/* Game Over Overlay */}
@@ -513,13 +531,13 @@ const Hangman: React.FC = () => {
               exit={{ opacity: 0 }}
             >
               <motion.div
-                className="bg-terminal-black/95 border border-terminal-green/50 rounded-lg p-6 max-w-xs flex flex-col items-center shadow-lg shadow-terminal-green/10"
+                className="bg-terminal-black/95 border border-terminal-green/50 rounded-lg p-4 sm:p-6 max-w-xs flex flex-col items-center shadow-lg shadow-terminal-green/10"
                 initial={{ scale: 0.9, y: 20 }}
                 animate={{ scale: 1, y: 0 }}
                 transition={{ type: 'spring', damping: 15 }}
               >
                 <motion.div
-                  className={`text-2xl font-bold mb-3 ${gameState.gameStatus === 'won' ? 'text-terminal-green' : 'text-red-500'}`}
+                  className={`text-xl sm:text-2xl font-bold mb-2 sm:mb-3 ${gameState.gameStatus === 'won' ? 'text-terminal-green' : 'text-red-500'}`}
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
@@ -528,7 +546,7 @@ const Hangman: React.FC = () => {
                 </motion.div>
 
                 <motion.div
-                  className="text-terminal-green mb-2"
+                  className="text-terminal-green mb-1 sm:mb-2"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
@@ -537,7 +555,7 @@ const Hangman: React.FC = () => {
                 </motion.div>
 
                 <motion.div
-                  className="text-2xl font-mono tracking-wider text-terminal-green mb-4 border-b border-terminal-green/30 pb-2"
+                  className="text-xl sm:text-2xl font-mono tracking-wider text-terminal-green mb-3 sm:mb-4 border-b border-terminal-green/30 pb-2"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.4 }}
@@ -547,7 +565,7 @@ const Hangman: React.FC = () => {
 
                 {gameState.gameStatus === 'won' && (
                   <motion.div
-                    className="text-terminal-green/80 mb-4 bg-terminal-green/10 px-4 py-2 rounded-md border border-terminal-green/30"
+                    className="text-terminal-green/80 mb-3 sm:mb-4 bg-terminal-green/10 px-3 sm:px-4 py-1 sm:py-2 rounded-md border border-terminal-green/30"
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.5 }}
@@ -572,21 +590,21 @@ const Hangman: React.FC = () => {
           )}
         </AnimatePresence>
 
-        {/* Instructions and Controls */}
-        <div className="w-full flex justify-between items-center mt-1">
-          {/* Instructions */}
+        {/* Mobile-optimized Instructions and Controls */}
+        <div className="w-full flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0 mt-1 px-1">
+          {/* Instructions - Centered on mobile, left on desktop */}
           {gameState.gameStatus === 'playing' && (
-            <div className="text-terminal-green/70 text-xs font-mono border border-terminal-green/20 bg-terminal-black/40 px-3 py-1.5 rounded-md">
-              Type or click letters to guess the word
+            <div className="text-terminal-green/70 text-xs font-mono border border-terminal-green/20 bg-terminal-black/40 px-2 py-1 sm:px-3 sm:py-1.5 rounded-md w-full sm:w-auto text-center sm:text-left">
+              Type or click letters to guess
             </div>
           )}
 
-          {/* Game Control Buttons */}
+          {/* Game Control Buttons - Centered on mobile, right on desktop */}
           <button
             onClick={resetGame}
             className="px-4 py-1.5 border border-terminal-green text-terminal-green 
                      hover:bg-terminal-green hover:text-terminal-black transition-colors
-                     font-mono text-sm rounded-md ml-auto"
+                     font-mono text-sm rounded-md w-full sm:w-auto sm:ml-auto"
             aria-label={gameState.gameStatus === 'playing' ? 'Start new game' : 'Play again'}
           >
             {gameState.gameStatus === 'playing' ? 'New Game' : 'Play Again'}
