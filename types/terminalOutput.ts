@@ -64,7 +64,26 @@ export interface ListOutput extends BaseOutput {
 export interface GameOutput extends BaseOutput {
   type: 'game-output';
   game: 'tictactoe' | 'snake' | 'hangman';
-  state?: any; // Game state will be managed by individual game components
+  state?: TicTacToeState | SnakeState | HangmanState;
+}
+
+export interface TicTacToeState {
+  board: ('X' | 'O' | null)[];
+  currentPlayer: 'X' | 'O';
+  winner?: 'X' | 'O' | 'draw';
+}
+
+export interface SnakeState {
+  snake: { x: number; y: number }[];
+  direction: 'up' | 'down' | 'left' | 'right';
+  food: { x: number; y: number };
+  score: number;
+}
+
+export interface HangmanState {
+  word: string;
+  guessedLetters: string[];
+  remainingAttempts: number;
 }
 
 export type TerminalOutputType =

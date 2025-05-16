@@ -145,6 +145,9 @@ export const generateSnakeFood = (
   height: number,
   snake: SnakeSegment[]
 ): SnakeSegment => {
+  // Create a set of occupied positions for fast lookup elsewhere in the game
+  const occupiedPositions = new Set(snake.map((segment) => `${segment.x},${segment.y}`));
+
   // Create an array of all possible positions
   const allPositions: SnakeSegment[] = [];
   for (let x = 0; x < width; x++) {
@@ -155,10 +158,14 @@ export const generateSnakeFood = (
 
   // Filter out positions occupied by the snake
   const availablePositions = allPositions.filter(
-    (pos) => !snake.some((segment) => segment.x === pos.x && segment.y === pos.y)
+    (pos) => !occupiedPositions.has(`${pos.x},${pos.y}`)
   );
 
-  // Select a random position for food
+  if (availablePositions.length === 0) {
+    throw new Error('No available positions for food. The snake might be filling the entire grid.');
+  }
+
+  // Randomly pick one available position
   return availablePositions[Math.floor(Math.random() * availablePositions.length)];
 };
 

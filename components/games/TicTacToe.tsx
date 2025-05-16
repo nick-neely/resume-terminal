@@ -117,6 +117,7 @@ const TicTacToe: React.FC = () => {
               key={i}
               onClick={() => handleClick(i)}
               disabled={!isPlayerTurn || !isGameActive || !!square}
+              aria-label={`Row ${Math.floor(i / 3) + 1}, Column ${(i % 3) + 1}: ${square ? square : 'empty'}`}
               className={`
                 w-16 h-16 border-2 
                 ${square === playerSymbol ? 'border-terminal-green' : 'border-terminal-green/30'}
