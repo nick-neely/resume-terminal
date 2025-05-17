@@ -1,10 +1,10 @@
+import { PostHogProvider } from '@/components/PostHogProvider';
 import { Toaster } from '@/components/ui/sonner';
 import { config } from '@/config';
 import '@/styles/print.css';
 import type { Metadata } from 'next';
 import { Fira_Code, Inter } from 'next/font/google';
 import './globals.css';
-import { PostHogProvider } from '@/components/PostHogProvider';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const firaCode = Fira_Code({
