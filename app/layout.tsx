@@ -1,3 +1,4 @@
+import { PostHogProvider } from '@/components/PostHogProvider';
 import { Toaster } from '@/components/ui/sonner';
 import { config } from '@/config';
 import '@/styles/print.css';
@@ -51,10 +52,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${inter.variable} ${firaCode.variable}`}>
       <body className="min-h-screen bg-zinc-900 transition-all duration-300">
-        <div className="min-h-screen bg-gradient-to-br from-zinc-900 to-zinc-800 transition-all duration-300">
-          {children}
-        </div>
-        <Toaster />
+        <PostHogProvider>
+          <div className="min-h-screen bg-gradient-to-br from-zinc-900 to-zinc-800 transition-all duration-300">
+            {children}
+          </div>
+          <Toaster />
+        </PostHogProvider>
       </body>
     </html>
   );
