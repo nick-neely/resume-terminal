@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     siteName: title,
     images: [
       {
-        url: `${url}api/og`,
+        url: `${url}og.png`,
         width: 1200,
         height: 630,
       },
